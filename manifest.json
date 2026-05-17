@@ -1,0 +1,26 @@
+{
+  "name": "Chromatic Maze",
+  "short_name": "ChromaMaze",
+  "description": "Un labyrinthe où tu dois alterner les portes rouges et vertes.",
+  "start_url": "./index.html",
+  "display": "fullscreen",
+  "orientation": "portrait",
+  "background_color": "#07070d",
+  "theme_color": "#07070d",
+  "icons": [
+    {
+      "src": "icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "categories": ["games", "entertainment"],
+  "lang": "fr"
+}
