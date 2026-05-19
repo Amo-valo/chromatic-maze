@@ -497,6 +497,98 @@
     #dpad { transition: opacity .2s; }
     #dpad.hidden { opacity: 0; pointer-events: none; }
 
+    /* ── JOKER HUD (sous bottom-hud, visible pendant le jeu) ── */
+    #joker-hud {
+      display: none; align-items: center; justify-content: space-between;
+      width: 100%; max-width: 440px;
+      padding: 2px 18px 2px; position: relative; z-index: 1;
+    }
+    #joker-hud.show { display: flex; }
+    #joker-count-wrap {
+      font-family: 'Share Tech Mono', monospace; font-size: 10px;
+      color: #ffcc44; letter-spacing: 1px; display: flex; align-items: center; gap: 5px;
+    }
+    #joker-passemur-btn {
+      font-family: 'Orbitron', monospace; font-size: 7px; font-weight: 700;
+      letter-spacing: 1px; padding: 5px 11px;
+      border: 1.5px solid #5544aa; color: #8877ff;
+      border-radius: 6px; background: rgba(80,60,180,.10); cursor: pointer;
+      transition: all .2s; -webkit-tap-highlight-color: transparent;
+    }
+    #joker-passemur-btn:active { background: rgba(120,80,255,.20); transform: scale(.95); }
+    #joker-passemur-btn.active {
+      border-color: #aa88ff; color: #ccaaff;
+      background: rgba(120,80,255,.25);
+      animation: jokerPulse .8s ease-in-out infinite alternate;
+    }
+    @keyframes jokerPulse {
+      from { box-shadow: 0 0 6px rgba(120,80,255,.3); }
+      to   { box-shadow: 0 0 18px rgba(120,80,255,.7); }
+    }
+
+    /* ── SLIDE ZONE (remplace D-pad) ── */
+    #slide-zone {
+      position: relative; z-index: 1;
+      width: calc(100% - 28px); max-width: 412px;
+      height: 120px;
+      display: flex; align-items: center; justify-content: center;
+      border-radius: 14px;
+      margin: 4px 0 max(10px, env(safe-area-inset-bottom));
+      background: var(--dpad-bg); border: 1px solid var(--dpad-border);
+      cursor: grab; touch-action: none; user-select: none;
+      -webkit-tap-highlight-color: transparent; transition: background .15s, border-color .15s;
+    }
+    #slide-zone.swiping { background: rgba(0,255,153,.05); border-color: rgba(0,255,153,.18); cursor: grabbing; }
+    #slide-zone.hidden { opacity: 0; pointer-events: none; }
+    #slide-hint {
+      font-family: 'Share Tech Mono', monospace; font-size: 9px;
+      letter-spacing: 2px; color: var(--dpad-color); opacity: .35;
+      user-select: none; pointer-events: none; text-align: center; line-height: 2;
+    }
+
+    /* ── JOKER TOAST NOTIFICATION ── */
+    .joker-toast {
+      position: fixed; top: 56px; left: 50%; transform: translateX(-50%);
+      background: rgba(0,0,0,.88); border: 1px solid #ffcc44;
+      color: #ffcc44; font-family: 'Orbitron', monospace; font-size: 9px;
+      letter-spacing: 2px; padding: 6px 18px; border-radius: 20px; z-index: 200;
+      pointer-events: none; white-space: nowrap;
+      animation: toastAnim 2.6s ease forwards;
+    }
+    [data-theme="light"] .joker-toast { background: rgba(255,255,240,.95); }
+    @keyframes toastAnim {
+      0%   { opacity: 0; transform: translateX(-50%) translateY(-10px); }
+      12%  { opacity: 1; transform: translateX(-50%) translateY(0); }
+      78%  { opacity: 1; }
+      100% { opacity: 0; transform: translateX(-50%) translateY(-6px); }
+    }
+
+    /* ── JOKER VIE BTN (game over) ── */
+    #joker-life-btn {
+      font-family: 'Orbitron', monospace; font-size: 9px; font-weight: 700;
+      letter-spacing: 2px; padding: 9px 22px; margin-top: 8px;
+      border: 1.5px solid #aa8800; color: #ffcc44;
+      border-radius: 8px; background: rgba(255,204,68,.10); cursor: pointer;
+      transition: all .2s; -webkit-tap-highlight-color: transparent;
+      display: none; box-shadow: 0 0 10px rgba(255,204,68,.20);
+    }
+    #joker-life-btn:active { background: rgba(255,204,68,.22); transform: scale(.97); }
+
+    /* ── BUY JOKER (settings) ── */
+    #buy-joker-btn {
+      font-family: 'Orbitron', monospace; font-size: 8px; font-weight: 700;
+      letter-spacing: 1px; padding: 5px 12px;
+      border: 1px solid #554400; color: #ffcc44;
+      border-radius: 6px; background: rgba(255,204,68,.08); cursor: pointer;
+      transition: all .2s; -webkit-tap-highlight-color: transparent; white-space: nowrap;
+    }
+    #buy-joker-btn:active { background: rgba(255,204,68,.20); }
+    #buy-joker-btn:disabled { opacity: .35; cursor: not-allowed; }
+    #buy-joker-info { font-family:'Share Tech Mono',monospace; font-size:8px;
+      color: var(--overlay-sub2); text-align:center; margin-top:5px; letter-spacing:1px; }
+    #buy-joker-msg { font-family:'Share Tech Mono',monospace; font-size:8px;
+      text-align:center; margin-top:4px; display:none; letter-spacing:1px; }
+
     /* ── SETTINGS BTN (gear) ── */
     #settings-btn {
       position: absolute; top: 10px; right: 12px; z-index: 20;
@@ -600,6 +692,12 @@
             <span class="toggle-slider"></span>
           </label>
         </div>
+        <div class="settings-row">
+          <div class="settings-label"><span>💛</span>ACHETER JOKER</div>
+          <button id="buy-joker-btn">500 pts</button>
+        </div>
+        <div id="buy-joker-info"></div>
+        <div id="buy-joker-msg"></div>
         <button id="settings-back">← RETOUR</button>
       </div>
       <!-- Skins section -->
@@ -622,6 +720,7 @@
       </div>
       <!-- Game over -->
       <div id="go-section">
+        <button id="joker-life-btn">💛 CONTINUER AVEC 1 VIE</button>
         <div id="go-input-row">
           <input id="player-name" type="text" maxlength="10" placeholder="TON NOM"
                  autocomplete="off" autocapitalize="characters" spellcheck="false"/>
@@ -654,7 +753,18 @@
     <div id="score-wrap">SCORE : <span id="sc">0</span></div>
   </div>
 
-  <div id="dpad">
+  <div id="joker-hud">
+    <div id="joker-count-wrap">💛 <span id="jk-num">0</span> <span id="jk-label">JOKER</span></div>
+    <button id="joker-passemur-btn">🛡️ PASSE-MUR</button>
+  </div>
+
+  <!-- Slide zone (remplace D-pad) -->
+  <div id="slide-zone" class="hidden">
+    <span id="slide-hint">← GLISSE ICI →<br>↑ ↓</span>
+  </div>
+
+  <!-- D-pad conservé pour compatibilité clavier (caché) -->
+  <div id="dpad" style="display:none">
     <div class="dpad-btn" id="btn-up">▲</div>
     <div class="dpad-btn" id="btn-left">◀</div>
     <div class="dpad-btn" id="btn-down">▼</div>
@@ -861,6 +971,7 @@ let infiniteIdx = 0;   // >0 = mode infini (1-based counter)
 let isDailyChallenge = false;
 let livesAtLevelStart = 3; // pour la médaille "sans faute"
 let currentSkin = 'default';
+let jokerPasseMurActive = false;
 
 /* ══════ PARTICLES (drawn on game canvas) ══════ */
 let particles = [];
@@ -949,6 +1060,7 @@ function sfxGameOver(){beep(220,.1,'sawtooth',.18);setTimeout(()=>beep(180,.15,'
 function sfxCombo(m){const f=[440,550,660,770,880][Math.min(m-2,4)];beep(f,.05,'square',.08);setTimeout(()=>beep(f*1.5,.07,'sine',.06),35);}
 
 /* ══════ LOCALSTORAGE ══════ */
+const JOKERS_KEY    = 'cmaze_jokers';
 const SCORE_KEY     = 'chromatic_maze_scores';
 const STARS_KEY     = 'cmaze_stars';
 const REC_KEY       = 'cmaze_records';
@@ -1011,6 +1123,29 @@ function checkAndAwardBadges(levelLabel, isPrestige) {
   if(presP>=0       && awardBadge('prestige_one')) newBadges.push('prestige_one');
   if(presP>=PRESTIGE_LEVELS.length-1 && awardBadge('prestige_all')) newBadges.push('prestige_all');
   return newBadges;
+}
+
+/* ─ Jokers ─ */
+function getJokers()  { return getLS(JOKERS_KEY, 0); }
+function addJoker()   { setLS(JOKERS_KEY, Math.min(getJokers()+1, 9)); }
+function spendJoker() { const j=getJokers(); if(j<=0)return false; setLS(JOKERS_KEY,j-1); return true; }
+
+function showJokerToast(msg) {
+  const el=document.createElement('div');
+  el.className='joker-toast'; el.textContent=msg;
+  document.body.appendChild(el);
+  setTimeout(()=>el.remove(), 2700);
+}
+
+function updateJokerHUD() {
+  const j=getJokers();
+  document.getElementById('jk-num').textContent=j;
+  document.getElementById('jk-label').textContent=j>1?'JOKERS':'JOKER';
+  const btn=document.getElementById('joker-passemur-btn');
+  btn.disabled=(j<=0);
+  btn.style.opacity=j>0?'1':'.35';
+  if(jokerPasseMurActive) btn.classList.add('active');
+  else btn.classList.remove('active');
 }
 
 /* ─ Skin ─ */
@@ -1397,7 +1532,7 @@ function secBtnSetup(id, label, cb) {
   }
 }
 
-function showOverlay({title,sublabel='',sub,btn,btn2=null,btn3=null,color='#fff',btnClass='',biasR=null,cb,cb2=null,cb3=null,gameOver=false,starsN=null}){
+function showOverlay({title,sublabel='',sub,btn,btn2=null,btn3=null,color='#fff',btnClass='',biasR=null,cb,cb2=null,cb3=null,gameOver=false,starsN=null,hasJokerLife=false}){
   document.getElementById('level-select-section').classList.remove('show');
   document.getElementById('scores-section').classList.remove('show');
   document.getElementById('skin-section').classList.remove('show');
@@ -1405,8 +1540,10 @@ function showOverlay({title,sublabel='',sub,btn,btn2=null,btn3=null,color='#fff'
   document.getElementById('skin-btn').classList.remove('show');
   document.getElementById('quit-btn').classList.remove('show');
   document.getElementById('settings-btn').classList.remove('show');
-  document.getElementById('dpad').classList.add('hidden');
+  document.getElementById('slide-zone').classList.add('hidden');
+  document.getElementById('joker-hud').classList.remove('show');
   document.getElementById('badges-row').style.display='none';
+  jokerPasseMurActive=false;
   // main content
   const ids = ['ot','olvl','os','stars-display'];
   ids.forEach(id => { const el=document.getElementById(id); if(el)el.style.display=''; });
@@ -1454,7 +1591,14 @@ function showOverlay({title,sublabel='',sub,btn,btn2=null,btn3=null,color='#fff'
     document.getElementById('go-saved').style.display='none';
     document.getElementById('go-input-row').style.display='flex';
     renderLeaderboard(null);
-  }else{goSection.classList.remove('show');}
+    // Joker vie bonus
+    const jlBtn=document.getElementById('joker-life-btn');
+    jlBtn.style.display=hasJokerLife?'block':'none';
+    if(hasJokerLife) jlBtn.textContent=`💛 CONTINUER AVEC 1 VIE (${getJokers()} joker${getJokers()>1?'s':''})`;
+  }else{
+    goSection.classList.remove('show');
+    document.getElementById('joker-life-btn').style.display='none';
+  }
   document.getElementById('overlay').classList.add('show');
 }
 
@@ -1462,8 +1606,11 @@ function showStartOverlay(){
   document.getElementById('level-select-section').classList.remove('show');
   document.getElementById('scores-section').classList.remove('show');
   document.getElementById('skin-section').classList.remove('show');
+  document.getElementById('settings-section').classList.remove('show');
   document.getElementById('quit-btn').classList.remove('show');
-  document.getElementById('dpad').classList.add('hidden');
+  document.getElementById('slide-zone').classList.add('hidden');
+  document.getElementById('joker-hud').classList.remove('show');
+  jokerPasseMurActive=false;
   ['ot','olvl','os'].forEach(id => document.getElementById(id).style.display='');
   document.getElementById('ot').textContent='CHROMATIC MAZE';
   document.getElementById('ot').style.color='#fff';
@@ -1713,6 +1860,9 @@ function showSettingsOverlay(){
   // Sync toggle state
   const currentTheme = getLS(THEME_KEY, 'dark');
   document.getElementById('theme-toggle').checked = (currentTheme === 'light');
+  // Infos joker achat
+  updateBuyJokerInfo();
+  document.getElementById('buy-joker-msg').style.display='none';
   document.getElementById('settings-section').classList.add('show');
   document.getElementById('overlay').classList.add('show');
 }
@@ -1752,12 +1902,15 @@ function beginPlay(){
   const s=getPlayerStart();
   playerX=s.x;playerY=s.y;lastDoor=null;moveCount=0;gameState='playing';
   comboCount=0;comboMultiplier=1;
+  jokerPasseMurActive=false;
   livesAtLevelStart=lives;
   currentSkin=getSkinId();
   document.getElementById('combo-txt').classList.remove('show');
   document.getElementById('quit-btn').classList.add('show');
-  document.getElementById('dpad').classList.remove('hidden');
-  writeSave(); // sauvegarde au début de chaque niveau
+  document.getElementById('slide-zone').classList.remove('hidden');
+  document.getElementById('joker-hud').classList.add('show');
+  updateJokerHUD();
+  writeSave();
   hideOverlay();updateHUD();startTimer();drawScene();
 }
 
@@ -1844,6 +1997,14 @@ function handleExit(){
     newBadgesList=checkAndAwardBadges(lvl.label, lvl.isPrestige);
     if(isDailyChallenge){
       setLS(DAILY_KEY,{date:todayKey(),completed:true,score});
+    }
+    // Joker toutes les 3 niveaux normaux
+    if(!lvl.isPrestige && !lvl.isInfinite && infiniteIdx===0){
+      const lvlNum = levelIdx+1; // 1-based
+      if(lvlNum % 3 === 0) {
+        addJoker();
+        setTimeout(()=>showJokerToast(`💛 +1 JOKER ! (${getJokers()} en stock)`), 800);
+      }
     }
   }
 
@@ -1972,23 +2133,35 @@ function tryMove(dr,dc){
   const wall=getWall(playerY,playerX,nr,nc);
   if(!wall)return;
   if(lastDoor&&wall===lastDoor){
-    lives--;
-    vib([80,20,80]);
-    updateCombo(false);
-    sfxFail();flashPlayer(isLight()?RED_L:'#ff3535');updateHUD();
-    if(lives<=0){
-      stopTimer();gameState='gameover';sfxGameOver();clearSave();
-      setTimeout(()=>showOverlay({
-        title:'GAME OVER',sublabel:'',
-        sub:`Score : <span style="color:#ffcc44;font-size:15px;font-weight:700">${score}</span><br>Niveau atteint : ${getLvl().label}`,
-        btn:'REJOUER',color:RED,btnClass:'red',gameOver:true,
-        cb:()=>startGame()
-      }),400);
-    }else{
-      const s=getPlayerStart();
-      setTimeout(()=>{playerX=s.x;playerY=s.y;lastDoor=null;updateHUD();drawScene();},500);
+    if(jokerPasseMurActive){
+      // Joker passe-mur : ignorer la règle de couleur pour ce coup
+      jokerPasseMurActive=false;
+      spendJoker();
+      updateJokerHUD();
+      showJokerToast('🛡️ PASSE-MUR UTILISÉ !');
+      // Le mouvement continue (pas de return)
+    } else {
+      lives--;
+      vib([80,20,80]);
+      updateCombo(false);
+      sfxFail();flashPlayer(isLight()?RED_L:'#ff3535');updateHUD();
+      if(lives<=0){
+        stopTimer();gameState='gameover';sfxGameOver();clearSave();
+        setTimeout(()=>{
+          const hasJoker=getJokers()>0;
+          showOverlay({
+            title:'GAME OVER',sublabel:'',
+            sub:`Score : <span style="color:#ffcc44;font-size:15px;font-weight:700">${score}</span><br>Niveau atteint : ${getLvl().label}`,
+            btn:'REJOUER',color:RED,btnClass:'red',gameOver:true,hasJokerLife:hasJoker,
+            cb:()=>startGame()
+          });
+        },400);
+      }else{
+        const s=getPlayerStart();
+        setTimeout(()=>{playerX=s.x;playerY=s.y;lastDoor=null;updateHUD();drawScene();},500);
+      }
+      return;
     }
-    return;
   }
   playerX=nc;playerY=nr;lastDoor=wall;
   moveCount++;
@@ -2041,6 +2214,80 @@ document.getElementById('quit-btn').addEventListener('click',()=>{
   if(gameState==='playing'){stopTimer();gameState='paused';writeSave();}
   document.getElementById('quit-btn').classList.remove('show');
   showStartOverlay();
+});
+
+/* ══════ JOKER LISTENERS ══════ */
+document.getElementById('joker-passemur-btn').addEventListener('click',()=>{
+  if(getJokers()<=0 || gameState!=='playing') return;
+  jokerPasseMurActive=!jokerPasseMurActive;
+  updateJokerHUD();
+  if(jokerPasseMurActive){ sfxDoor('blue'); vib([20,10,20]); }
+});
+
+document.getElementById('joker-life-btn').addEventListener('click',()=>{
+  if(!spendJoker()) return;
+  document.getElementById('joker-life-btn').style.display='none';
+  lives=1; gameState='playing';
+  jokerPasseMurActive=false;
+  vib([30,15,30]); sfxDoor('green');
+  setupCanvas();buildMaze();updateHUD();beginPlay();
+});
+
+document.getElementById('buy-joker-btn').addEventListener('click',()=>{
+  const cost=500;
+  const msg=document.getElementById('buy-joker-msg');
+  if(score<cost){
+    msg.textContent='PAS ASSEZ DE POINTS ✕'; msg.style.color='#ff5555'; msg.style.display='block';
+    setTimeout(()=>msg.style.display='none',2200); return;
+  }
+  if(getJokers()>=9){
+    msg.textContent='MAXIMUM ATTEINT (9) ✕'; msg.style.color='#ff5555'; msg.style.display='block';
+    setTimeout(()=>msg.style.display='none',2200); return;
+  }
+  score-=cost; addJoker();
+  document.getElementById('sc').textContent=score;
+  updateBuyJokerInfo();
+  msg.textContent=`💛 JOKER ACHETÉ ! (${getJokers()} en stock)`; msg.style.color='#ffcc44'; msg.style.display='block';
+  sfxWin(); vib([30,15,30]);
+  setTimeout(()=>msg.style.display='none',2800);
+});
+
+function updateBuyJokerInfo(){
+  const el=document.getElementById('buy-joker-info');
+  if(el) el.textContent=`Score : ${score} pts  ·  ${getJokers()} joker${getJokers()!==1?'s':''} en stock`;
+  const btn=document.getElementById('buy-joker-btn');
+  if(btn) btn.disabled=(score<500||getJokers()>=9);
+}
+
+/* ══════ SLIDE ZONE ══════ */
+const slideZone=document.getElementById('slide-zone');
+let sz_tx=0,sz_ty=0,sz_mx=0,sz_my=0,sz_drag=false;
+
+slideZone.addEventListener('touchstart',e=>{
+  sz_tx=e.touches[0].clientX; sz_ty=e.touches[0].clientY;
+  slideZone.classList.add('swiping');
+  e.preventDefault();
+},{passive:false});
+
+slideZone.addEventListener('touchend',e=>{
+  slideZone.classList.remove('swiping');
+  const dx=e.changedTouches[0].clientX-sz_tx;
+  const dy=e.changedTouches[0].clientY-sz_ty;
+  if(Math.abs(dx)<18&&Math.abs(dy)<18) return;
+  Math.abs(dx)>Math.abs(dy)?tryMove(0,dx>0?1:-1):tryMove(dy>0?1:-1,0);
+  e.preventDefault();
+},{passive:false});
+
+slideZone.addEventListener('mousedown',e=>{
+  sz_mx=e.clientX; sz_my=e.clientY; sz_drag=true;
+  slideZone.classList.add('swiping');
+});
+window.addEventListener('mouseup',e=>{
+  if(!sz_drag) return; sz_drag=false;
+  slideZone.classList.remove('swiping');
+  const dx=e.clientX-sz_mx,dy=e.clientY-sz_my;
+  if(Math.abs(dx)<18&&Math.abs(dy)<18) return;
+  Math.abs(dx)>Math.abs(dy)?tryMove(0,dx>0?1:-1):tryMove(dy>0?1:-1,0);
 });
 
 if('serviceWorker'in navigator)navigator.serviceWorker.register('sw.js').catch(()=>{});
