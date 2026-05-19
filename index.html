@@ -136,12 +136,58 @@
       display: flex; flex-direction: column; align-items: center; justify-content: center;
       background: var(--bg-overlay); border-radius: 10px;
       z-index: 10; opacity: 0; pointer-events: none; transition: opacity .35s, background .35s;
-      overflow-y: auto; padding: 18px 0 14px;
+      overflow-y: auto; padding: 14px 0 14px;
     }
     #overlay.show { opacity: 1; pointer-events: all; }
+    #overlay.with-tabbar { padding-bottom: 72px; }
     #ot   { font-size: 20px; font-weight: 900; letter-spacing: 4px; margin-bottom: 3px; text-align: center; padding: 0 16px; }
-    #olvl { font-family: 'Share Tech Mono', monospace; font-size: 10px; color: var(--overlay-sub2); letter-spacing: 2px; margin-bottom: 8px; text-align: center; }
-    #os   { font-family: 'Share Tech Mono', monospace; font-size: 12px; color: var(--overlay-sub); letter-spacing: 1px; text-align: center; line-height: 2.3; padding: 0 22px; }
+    #olvl { font-family: 'Share Tech Mono', monospace; font-size: 10px; color: var(--overlay-sub2); letter-spacing: 2px; margin-bottom: 6px; text-align: center; }
+    #os   { font-family: 'Share Tech Mono', monospace; font-size: 13.5px; color: var(--overlay-sub); letter-spacing: .5px; text-align: center; line-height: 2.2; padding: 0 26px; margin-bottom: 4px; }
+
+    /* ── TAB BAR ── */
+    #tab-bar {
+      position: absolute; bottom: 0; left: 0; right: 0; height: 68px;
+      display: none; align-items: stretch;
+      border-top: 1px solid var(--cell-border);
+      background: var(--bg-overlay);
+      border-radius: 0 0 10px 10px; z-index: 15;
+    }
+    #tab-bar.show { display: flex; }
+    .tab-item {
+      flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center;
+      background: transparent; border: none; cursor: pointer; gap: 3px;
+      font-family: 'Orbitron', monospace; font-size: 6px; font-weight: 700;
+      letter-spacing: 1.5px; color: var(--overlay-sub2);
+      padding: 6px 2px 10px; transition: color .2s, background .2s;
+      -webkit-tap-highlight-color: transparent; position: relative;
+    }
+    .tab-item:active { background: rgba(0,255,153,.04); }
+    .tab-item.active { color: #00ff99; }
+    [data-theme="light"] .tab-item.active { color: #009955; }
+    .tab-item.active::after {
+      content: ''; position: absolute; top: 0; left: 20%; right: 20%;
+      height: 2px; border-radius: 0 0 2px 2px;
+      background: #00ff99;
+    }
+    [data-theme="light"] .tab-item.active::after { background: #009955; }
+    .tab-icon { font-size: 19px; line-height: 1; }
+    .tab-item.daily-done { opacity: .45; }
+
+    /* ── SKIN SECTION HEADER ── */
+    #skin-header {
+      display: flex; align-items: center; justify-content: center;
+      width: 100%; max-width: 280px; margin-bottom: 12px; position: relative;
+    }
+    #skin-back-icon {
+      position: absolute; left: 0;
+      font-size: 16px; font-weight: 900; line-height: 1;
+      color: #00ff99; background: rgba(0,255,153,.12);
+      border: 1.5px solid rgba(0,255,153,.35); border-radius: 8px;
+      padding: 5px 10px; cursor: pointer; transition: all .2s;
+      -webkit-tap-highlight-color: transparent;
+    }
+    [data-theme="light"] #skin-back-icon { color:#009955; background:rgba(0,153,85,.10); border-color:rgba(0,153,85,.3); }
+    #skin-back-icon:active { background: rgba(0,255,153,.25); transform: scale(.93); }
 
     /* Stars display */
     #stars-display { font-size: 24px; letter-spacing: 4px; margin: 4px 0; display: none; }
@@ -702,9 +748,11 @@
       </div>
       <!-- Skins section -->
       <div id="skin-section">
-        <div id="skin-title">SKINS · TRAÎNÉES</div>
+        <div id="skin-header">
+          <button id="skin-back-icon">←</button>
+          <div id="skin-title">SKINS · TRAÎNÉES</div>
+        </div>
         <div id="skin-grid"></div>
-        <button id="skin-back">← RETOUR</button>
       </div>
       <!-- Scores section -->
       <div id="scores-section">
@@ -736,10 +784,27 @@
       </div>
       <button id="obtn">COMMENCER</button>
       <button id="obtn2" class="sec-btn">↺ REFAIRE CE NIVEAU</button>
-      <button id="daily-btn" class="sec-btn">📅 DÉFI DU JOUR</button>
-      <button id="obtn3" class="sec-btn">SÉLECTION NIVEAUX</button>
-      <button id="score-btn" class="sec-btn">🏆 SCORES</button>
-      <button id="skin-btn" class="sec-btn">🎨 SKINS</button>
+      <!-- Ces boutons restent en DOM pour la logique JS mais sont gérés via la tab bar -->
+      <button id="daily-btn" class="sec-btn" style="display:none">📅 DÉFI DU JOUR</button>
+      <button id="obtn3" class="sec-btn" style="display:none">SÉLECTION NIVEAUX</button>
+      <button id="score-btn" class="sec-btn" style="display:none">🏆 SCORES</button>
+      <button id="skin-btn" class="sec-btn" style="display:none">🎨 SKINS</button>
+
+      <!-- TAB BAR -->
+      <div id="tab-bar">
+        <button class="tab-item" id="tab-daily">
+          <span class="tab-icon">📅</span>DÉFI
+        </button>
+        <button class="tab-item" id="tab-levels">
+          <span class="tab-icon">▤</span>NIVEAUX
+        </button>
+        <button class="tab-item" id="tab-scores">
+          <span class="tab-icon">🏆</span>SCORES
+        </button>
+        <button class="tab-item" id="tab-skins">
+          <span class="tab-icon">🎨</span>SKINS
+        </button>
+      </div>
     </div>
   </div>
 
@@ -787,8 +852,15 @@ function getCanvasBG() { return isLight() ? '#f3f3fb' : '#07070d'; }
 function getCanvasDot() { return isLight() ? '#d4d4ec' : '#13132a'; }
 function getCanvasGrid() { return isLight() ? '#c4c4de' : '#1a1a2e'; }
 
-// Couleur d'un mur selon le thème
+// Couleur d'un mur selon le thème et le skin actif
 function themedWallColor(w) {
+  const sk = getSkinDef(currentSkin);
+  if (sk.colors) {
+    // Le skin applique ses couleurs aux murs : index 0=rouge, 1=vert, 2=bleu
+    const idx = w==='red' ? 0 : w==='green' ? 1 : 2;
+    return sk.colors[Math.min(idx, sk.colors.length-1)];
+  }
+  // Skin par défaut : couleurs adaptées au thème
   if (isLight()) {
     if(w==='red')   return RED_L;
     if(w==='green') return GREEN_L;
@@ -799,18 +871,16 @@ function themedWallColor(w) {
   return BLUE;
 }
 
+// Convertit n'importe quelle couleur hex en rgba (compatible avec toutes les teintes de skins)
+function hexToRgba(hex, alpha) {
+  let h = hex.replace('#','');
+  if(h.length===3) h=h[0]+h[0]+h[1]+h[1]+h[2]+h[2];
+  const r=parseInt(h.slice(0,2),16),g=parseInt(h.slice(2,4),16),b=parseInt(h.slice(4,6),16);
+  return `rgba(${r},${g},${b},${alpha})`;
+}
+
 function getWallGlow(col) {
-  if (isLight()) {
-    // On compare aux couleurs douces
-    if(col===RED_L)   return RED_GLOW_L;
-    if(col===GREEN_L) return GREEN_GLOW_L;
-    if(col===BLUE_L)  return BLUE_GLOW_L;
-    // Fallback si couleur néon passée en light (ne devrait pas arriver)
-    return 'rgba(80,80,180,.18)';
-  }
-  if(col==='#ff3535') return 'rgba(255,53,53,.45)';
-  if(col==='#00ff99') return 'rgba(0,255,153,.45)';
-  return 'rgba(68,102,255,.50)';
+  return hexToRgba(col, isLight() ? 0.20 : 0.48);
 }
 
 // Couleur du joueur (blanc invisible sur fond clair → bleu marine)
@@ -1544,6 +1614,7 @@ function showOverlay({title,sublabel='',sub,btn,btn2=null,btn3=null,color='#fff'
   document.getElementById('joker-hud').classList.remove('show');
   document.getElementById('badges-row').style.display='none';
   jokerPasseMurActive=false;
+  hideTabBar();
   // main content
   const ids = ['ot','olvl','os','stars-display'];
   ids.forEach(id => { const el=document.getElementById(id); if(el)el.style.display=''; });
@@ -1694,6 +1765,9 @@ function showStartOverlay(){
   // ⚙️ Bouton paramètres — visible depuis l'accueil
   document.getElementById('settings-btn').classList.add('show');
 
+  // Tab bar
+  showTabBar(null);
+
   document.getElementById('overlay').classList.add('show');
 }
 function hideOverlay(){document.getElementById('overlay').classList.remove('show');}
@@ -1760,6 +1834,7 @@ function showLevelSelect(){
   });
 
   document.getElementById('level-select-section').classList.add('show');
+  showTabBar('tab-levels');
   document.getElementById('overlay').classList.add('show');
 }
 
@@ -1793,6 +1868,7 @@ function showScoresOverlay(){
       </div>`).join('');
   }
   document.getElementById('scores-section').classList.add('show');
+  showTabBar('tab-scores');
   document.getElementById('overlay').classList.add('show');
 }
 document.getElementById('sc-back').addEventListener('click',()=>{
@@ -1836,11 +1912,49 @@ function showSkinSelect(){
     grid.appendChild(cell);
   });
   document.getElementById('skin-section').classList.add('show');
+  showTabBar('tab-skins');
   document.getElementById('overlay').classList.add('show');
 }
-document.getElementById('skin-back').addEventListener('click',()=>{
+// skin-back-icon (nouveau bouton en haut à gauche de la section skins)
+document.getElementById('skin-back-icon').addEventListener('click',()=>{
   document.getElementById('skin-section').classList.remove('show');
   showStartOverlay();
+});
+
+/* ══════ TAB BAR ══════ */
+function setActiveTab(id) {
+  document.querySelectorAll('.tab-item').forEach(t=>t.classList.remove('active'));
+  if(id) document.getElementById(id).classList.add('active');
+}
+function showTabBar(activeId) {
+  document.getElementById('tab-bar').classList.add('show');
+  document.getElementById('overlay').classList.add('with-tabbar');
+  setActiveTab(activeId);
+  // Défi du jour : marquer si déjà fait
+  const dailyTab=document.getElementById('tab-daily');
+  if(isDailyDone()) dailyTab.classList.add('daily-done');
+  else dailyTab.classList.remove('daily-done');
+}
+function hideTabBar() {
+  document.getElementById('tab-bar').classList.remove('show');
+  document.getElementById('overlay').classList.remove('with-tabbar');
+}
+
+document.getElementById('tab-daily').addEventListener('click',()=>{
+  if(isDailyDone()){
+    showJokerToast('📅 DÉFI DU JOUR DÉJÀ TERMINÉ ✓'); return;
+  }
+  startDailyChallenge();
+});
+document.getElementById('tab-levels').addEventListener('click',()=>{
+  document.getElementById('overlay').classList.add('show');
+  showLevelSelect();
+});
+document.getElementById('tab-scores').addEventListener('click',()=>{
+  showScoresOverlay();
+});
+document.getElementById('tab-skins').addEventListener('click',()=>{
+  showSkinSelect();
 });
 
 /* ══════ SETTINGS OVERLAY ══════ */
