@@ -144,15 +144,21 @@
     #olvl { font-family: 'Share Tech Mono', monospace; font-size: 10px; color: var(--overlay-sub2); letter-spacing: 2px; margin-bottom: 6px; text-align: center; }
     #os   { font-family: 'Share Tech Mono', monospace; font-size: 13.5px; color: var(--overlay-sub); letter-spacing: .5px; text-align: center; line-height: 2.2; padding: 0 26px; margin-bottom: 4px; }
 
-    /* ── TAB BAR ── */
-    #tab-bar {
-      position: absolute; bottom: 0; left: 0; right: 0; height: 68px;
+    /* ── TAB BAR OVERLAY (ancien, caché — remplacé par global-tab-bar) ── */
+    #tab-bar { display: none !important; }
+    #overlay.with-tabbar { padding-bottom: 0 !important; }
+
+    /* ── GLOBAL TAB BAR ── */
+    #global-tab-bar {
+      position: relative; z-index: 1;
+      width: 100%; max-width: 440px; flex-shrink: 0;
       display: none; align-items: stretch;
       border-top: 1px solid var(--cell-border);
-      background: var(--bg-overlay);
-      border-radius: 0 0 10px 10px; z-index: 15;
+      background: var(--bg-page);
+      padding-bottom: env(safe-area-inset-bottom);
+      transition: background .35s;
     }
-    #tab-bar.show { display: flex; }
+    #global-tab-bar.show { display: flex; }
     .tab-item {
       flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center;
       background: transparent; border: none; cursor: pointer; gap: 3px;
@@ -172,6 +178,33 @@
     [data-theme="light"] .tab-item.active::after { background: #009955; }
     .tab-icon { font-size: 19px; line-height: 1; }
     .tab-item.daily-done { opacity: .45; }
+    /* Home tab — légèrement mis en valeur */
+    #tab-home .tab-icon { font-size: 21px; }
+    #tab-home { opacity: .9; }
+
+    /* ── HUD GAME (au-dessus du canvas, visible pendant le jeu) ── */
+    #hud-game {
+      position: relative; z-index: 1; width: 100%; max-width: 440px;
+      display: none; align-items: center; justify-content: space-between;
+      padding: 2px 18px; flex-shrink: 0;
+    }
+    #hud-game.show { display: flex; }
+
+    /* ── HUD JOKERS 2 POOLS (au-dessus du canvas) ── */
+    #hud-jokers {
+      display: none; align-items: center; justify-content: space-between;
+      width: 100%; max-width: 440px; flex-shrink: 0;
+      padding: 2px 18px; position: relative; z-index: 1;
+    }
+    #hud-jokers.show { display: flex; }
+    #joker-life-count {
+      font-family: 'Share Tech Mono', monospace; font-size: 10px;
+      color: #ffcc44; letter-spacing: 1px; display: flex; align-items: center; gap: 4px;
+    }
+    #joker-pass-count {
+      font-family: 'Share Tech Mono', monospace; font-size: 9px;
+      color: #8877ff; letter-spacing: 1px; display: flex; align-items: center; gap: 4px;
+    }
 
     /* ── SKIN SECTION HEADER ── */
     #skin-header {
@@ -543,13 +576,8 @@
     #dpad { transition: opacity .2s; }
     #dpad.hidden { opacity: 0; pointer-events: none; }
 
-    /* ── JOKER HUD (sous bottom-hud, visible pendant le jeu) ── */
-    #joker-hud {
-      display: none; align-items: center; justify-content: space-between;
-      width: 100%; max-width: 440px;
-      padding: 2px 18px 2px; position: relative; z-index: 1;
-    }
-    #joker-hud.show { display: flex; }
+    /* ── JOKER HUD (ancien, remplacé par #hud-jokers) ── */
+    #joker-hud { display: none !important; }
     #joker-count-wrap {
       font-family: 'Share Tech Mono', monospace; font-size: 10px;
       color: #ffcc44; letter-spacing: 1px; display: flex; align-items: center; gap: 5px;
@@ -576,7 +604,7 @@
     #slide-zone {
       position: relative; z-index: 1;
       width: calc(100% - 28px); max-width: 412px;
-      height: 120px;
+      height: 170px;
       display: flex; align-items: center; justify-content: center;
       border-radius: 14px;
       margin: 4px 0 max(10px, env(safe-area-inset-bottom));
@@ -689,6 +717,36 @@
       margin:6px auto 0; max-width:220px; justify-content:center;
     }
     .skin-unlock-dots { display:flex; gap:3px; }
+
+    /* ── PLAYER SKINS SECTION ── */
+    #player-skin-separator {
+      width:100%; max-width:260px; border:none; border-top:1px solid var(--cell-border);
+      margin:10px 0 8px;
+    }
+    #player-skin-title {
+      font-family:'Share Tech Mono',monospace; font-size:8px; color:var(--overlay-sub2);
+      letter-spacing:3px; margin-bottom:8px; text-align:center;
+    }
+    #player-skin-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:6px; width:100%; max-width:260px; margin-bottom:4px; }
+    .pskin-cell {
+      display:flex; flex-direction:column; align-items:center; justify-content:center;
+      border:1px solid var(--cell-border); border-radius:8px; padding:8px 4px;
+      cursor:pointer; transition:all .15s; background:var(--cell-bg); min-height:58px;
+    }
+    .pskin-cell.selected { border-color:#00ff99; box-shadow:0 0 8px rgba(0,255,153,.2); }
+    .pskin-cell.locked   { opacity:.3; cursor:not-allowed; pointer-events:none; }
+    .pskin-cell:not(.locked):hover { border-color:var(--txt-hud); background:var(--cell-hover); }
+    .pskin-ball { width:18px; height:18px; border-radius:50%; margin-bottom:5px; }
+    .pskin-name { font-family:'Share Tech Mono',monospace; font-size:7px; color:var(--overlay-sub2); letter-spacing:1px; text-align:center; }
+    .pskin-cell.selected .pskin-name { color:#00ff99; }
+    .pskin-lock { font-size:7px; color:var(--btn-sec-color); letter-spacing:.5px; margin-top:2px; }
+
+    /* ── BUY JOKER OPTIONS ── */
+    .buy-joker-row {
+      display:flex; align-items:center; justify-content:space-between;
+      width:100%; max-width:240px; padding:6px 0; border-bottom:1px solid var(--cell-border);
+    }
+    .buy-joker-label { font-family:'Share Tech Mono',monospace; font-size:9px; color:var(--lb-name); letter-spacing:1px; }
   </style>
 </head>
 <body>
@@ -711,6 +769,21 @@
     <div id="timer-wrap">⏱ <span id="timer">00:00</span></div>
     <div id="lvl-badge">LEVEL 01</div>
     <button id="quit-btn"><span>✕</span><span>QUITTER</span></button>
+  </div>
+
+  <!-- HUD JEU : PORTE / MOVES / SCORE — visible pendant le jeu -->
+  <div id="hud-game">
+    <div id="last-door-wrap">PORTE : <span id="ldtxt">—</span></div>
+    <div id="moves-wrap">
+      <span class="mv-cur" id="mvtxt">0</span><span class="mv-sep"> / </span><span class="mv-min" id="minmvtxt">MIN ?</span>
+    </div>
+    <div id="score-wrap">SCORE : <span id="sc">0</span></div>
+  </div>
+
+  <!-- JOKERS 2 POOLS — visible pendant le jeu -->
+  <div id="hud-jokers">
+    <div id="joker-life-count">💛 <span id="jk-life-num">0</span> VIE</div>
+    <button id="joker-passemur-btn">🛡️ PASSE-MUR · <span id="jk-pass-num">0</span></button>
   </div>
 
   <div id="canvas-wrap">
@@ -753,6 +826,10 @@
           <div id="skin-title">SKINS · TRAÎNÉES</div>
         </div>
         <div id="skin-grid"></div>
+        <!-- Skins joueur (couleur balle) -->
+        <hr id="player-skin-separator">
+        <div id="player-skin-title">SKINS · JOUEUR</div>
+        <div id="player-skin-grid"></div>
       </div>
       <!-- Scores section -->
       <div id="scores-section">
@@ -790,37 +867,17 @@
       <button id="score-btn" class="sec-btn" style="display:none">🏆 SCORES</button>
       <button id="skin-btn" class="sec-btn" style="display:none">🎨 SKINS</button>
 
-      <!-- TAB BAR -->
-      <div id="tab-bar">
-        <button class="tab-item" id="tab-daily">
-          <span class="tab-icon">📅</span>DÉFI
-        </button>
-        <button class="tab-item" id="tab-levels">
-          <span class="tab-icon">▤</span>NIVEAUX
-        </button>
-        <button class="tab-item" id="tab-scores">
-          <span class="tab-icon">🏆</span>SCORES
-        </button>
-        <button class="tab-item" id="tab-skins">
-          <span class="tab-icon">🎨</span>SKINS
-        </button>
-      </div>
     </div>
   </div>
 
   <div id="combo-wrap"><span id="combo-txt"></span></div>
 
-  <div id="bottom-hud">
-    <div id="last-door-wrap">PORTE : <span id="ldtxt">—</span></div>
-    <div id="moves-wrap">
-      <span class="mv-cur" id="mvtxt">0</span><span class="mv-sep"> / </span><span class="mv-min" id="minmvtxt">MIN ?</span>
-    </div>
-    <div id="score-wrap">SCORE : <span id="sc">0</span></div>
-  </div>
+  <!-- bottom-hud caché (contenu déplacé dans #hud-game) -->
+  <div id="bottom-hud" style="display:none"></div>
 
+  <!-- joker-hud ancien (remplacé par #hud-jokers) -->
   <div id="joker-hud">
     <div id="joker-count-wrap">💛 <span id="jk-num">0</span> <span id="jk-label">JOKER</span></div>
-    <button id="joker-passemur-btn">🛡️ PASSE-MUR</button>
   </div>
 
   <!-- Slide zone (remplace D-pad) -->
@@ -834,6 +891,25 @@
     <div class="dpad-btn" id="btn-left">◀</div>
     <div class="dpad-btn" id="btn-down">▼</div>
     <div class="dpad-btn" id="btn-right">▶</div>
+  </div>
+
+  <!-- GLOBAL TAB BAR — visible sauf pendant le jeu -->
+  <div id="global-tab-bar">
+    <button class="tab-item" id="tab-daily">
+      <span class="tab-icon">📅</span>DÉFI
+    </button>
+    <button class="tab-item" id="tab-levels">
+      <span class="tab-icon">▤</span>NIVEAUX
+    </button>
+    <button class="tab-item" id="tab-home">
+      <span class="tab-icon">🏠</span>ACCUEIL
+    </button>
+    <button class="tab-item" id="tab-scores">
+      <span class="tab-icon">🏆</span>SCORES
+    </button>
+    <button class="tab-item" id="tab-skins">
+      <span class="tab-icon">🎨</span>SKINS
+    </button>
   </div>
 
 <script>
@@ -883,10 +959,21 @@ function getWallGlow(col) {
   return hexToRgba(col, isLight() ? 0.20 : 0.48);
 }
 
-// Couleur du joueur (blanc invisible sur fond clair → bleu marine)
-function getPlayerFill()    { return isLight() ? '#2233aa' : '#ffffff'; }
-function getPlayerGlow()    { return isLight() ? 'rgba(30,50,200,.30)' : 'rgba(255,255,255,.35)'; }
-function getPlayerStroke()  { return isLight() ? 'rgba(30,50,200,.12)' : 'rgba(255,255,255,.12)'; }
+// Couleur du joueur selon le skin sélectionné
+function getPlayerFill() {
+  const sk = getPlayerSkinDef(currentPlayerSkin);
+  // En mode clair, le skin blanc devient bleu marine pour rester visible
+  if (sk.id === 'white' && isLight()) return '#2233aa';
+  return sk.color;
+}
+function getPlayerGlow() {
+  const sk = getPlayerSkinDef(currentPlayerSkin);
+  if (sk.id === 'white' && isLight()) return 'rgba(30,50,200,.30)';
+  return sk.glow;
+}
+function getPlayerStroke() {
+  return hexToRgba(getPlayerFill(), isLight() ? 0.12 : 0.12);
+}
 
 // Couleurs indicateurs entrée/sortie (adaptées mode clair)
 function getEntryColor()    { return isLight() ? GREEN_L : GREEN; }
@@ -979,19 +1066,29 @@ const PRESTIGE_LEVELS = [
     hint:'9×9 · 3 couleurs · équilibré.<br>Le défi ultime de Chromatic Maze.' },
 ];
 
-/* ══════ SKINS ══════ */
+/* ══════ SKINS TRAÎNÉES ══════ */
 const SKINS = [
   { id:'default',  name:'DÉFAUT',   emoji:'⚪', unlockProgress:-1,
-    colors:null, desc:'Couleur de la porte' },
-  { id:'fire',     name:'FEU',      emoji:'🔥', unlockProgress:4,
-    colors:['#ff6600','#ff3300','#ffaa00'], desc:'Niv. 05 requis' },
-  { id:'electric', name:'FOUDRE',   emoji:'⚡', unlockProgress:7,
-    colors:['#00ccff','#ffffff','#88ddff'], desc:'Niv. 08 requis' },
-  { id:'neon',     name:'NÉON',     emoji:'🌈', unlockProgress:11,
-    colors:['#ff00ff','#00ffff','#ff88ff'], desc:'Niv. 12 requis' },
-  { id:'rainbow',  name:'PRISME',   emoji:'✨', unlockProgress:14,
-    colors:['#ff3535','#00ff99','#4466ff','#ffcc44'], desc:'Niv. 15 requis' },
+    colors:null, desc:'Toujours disponible' },
+  { id:'fire',     name:'FEU',      emoji:'🔥', unlockProgress:9,
+    colors:['#ff6600','#ff3300','#ffaa00'], desc:'10 niveaux requis' },
+  { id:'electric', name:'FOUDRE',   emoji:'⚡', unlockProgress:14,
+    colors:['#00ccff','#ffffff','#88ddff'], desc:'15 niveaux requis' },
+  { id:'neon',     name:'NÉON',     emoji:'🌈', unlockProgress:19,
+    colors:['#ff00ff','#00ffff','#ff88ff'], desc:'20 niveaux requis' },
+  { id:'rainbow',  name:'PRISME',   emoji:'✨', unlockProgress:24,
+    colors:['#ff3535','#00ff99','#4466ff','#ffcc44'], desc:'25 niv. / prestige' },
 ];
+
+/* ══════ SKINS JOUEUR (couleur de la balle) ══════ */
+const PLAYER_SKINS = [
+  { id:'white',    name:'CLASSIQUE', emoji:'⚪', color:'#ffffff', glow:'rgba(255,255,255,.45)', unlockProgress:-1 },
+  { id:'gold',     name:'OR',        emoji:'🟡', color:'#ffcc44', glow:'rgba(255,204,68,.55)',  unlockProgress:9 },
+  { id:'ruby',     name:'RUBIS',     emoji:'🔴', color:'#ff4466', glow:'rgba(255,68,102,.55)',  unlockProgress:14 },
+  { id:'sapphire', name:'SAPHIR',    emoji:'🔵', color:'#4499ff', glow:'rgba(68,153,255,.55)',  unlockProgress:19 },
+  { id:'emerald',  name:'ÉMERAUDE',  emoji:'💚', color:'#00ff88', glow:'rgba(0,255,136,.55)',   unlockProgress:24 },
+];
+const PLAYER_SKIN_KEY = 'cmaze_player_skin';
 
 /* Seuils speedrun par niveau (secondes) */
 const SPEED_THRESHOLDS = [25,30,40,42,55,62,62,72,72,82,92,92,105,115,125];
@@ -1130,7 +1227,9 @@ function sfxGameOver(){beep(220,.1,'sawtooth',.18);setTimeout(()=>beep(180,.15,'
 function sfxCombo(m){const f=[440,550,660,770,880][Math.min(m-2,4)];beep(f,.05,'square',.08);setTimeout(()=>beep(f*1.5,.07,'sine',.06),35);}
 
 /* ══════ LOCALSTORAGE ══════ */
-const JOKERS_KEY    = 'cmaze_jokers';
+const JOKERS_KEY      = 'cmaze_jokers'; // ancien (migration)
+const JOKERS_LIFE_KEY = 'cmaze_jokers_life';
+const JOKERS_PASS_KEY = 'cmaze_jokers_pass';
 const SCORE_KEY     = 'chromatic_maze_scores';
 const STARS_KEY     = 'cmaze_stars';
 const REC_KEY       = 'cmaze_records';
@@ -1195,10 +1294,25 @@ function checkAndAwardBadges(levelLabel, isPrestige) {
   return newBadges;
 }
 
-/* ─ Jokers ─ */
-function getJokers()  { return getLS(JOKERS_KEY, 0); }
-function addJoker()   { setLS(JOKERS_KEY, Math.min(getJokers()+1, 9)); }
-function spendJoker() { const j=getJokers(); if(j<=0)return false; setLS(JOKERS_KEY,j-1); return true; }
+/* ─ Jokers (2 pools) ─ */
+function _migrateJokers() {
+  // Migration: si l'ancien pool existe, le diviser entre les deux
+  const old = getLS(JOKERS_KEY, null);
+  if (old !== null && old > 0) {
+    const half = Math.ceil(old / 2);
+    if (!getLS(JOKERS_LIFE_KEY, null)) setLS(JOKERS_LIFE_KEY, Math.min(half, 9));
+    if (!getLS(JOKERS_PASS_KEY, null)) setLS(JOKERS_PASS_KEY, Math.min(old - half, 9));
+    localStorage.removeItem(JOKERS_KEY);
+  }
+}
+function getLifeJokers()  { return getLS(JOKERS_LIFE_KEY, 0); }
+function getPassJokers()  { return getLS(JOKERS_PASS_KEY, 0); }
+function addLifeJoker()   { setLS(JOKERS_LIFE_KEY, Math.min(getLifeJokers()+1, 9)); }
+function addPassJoker()   { setLS(JOKERS_PASS_KEY, Math.min(getPassJokers()+1, 9)); }
+function spendLifeJoker() { const j=getLifeJokers(); if(j<=0)return false; setLS(JOKERS_LIFE_KEY,j-1); return true; }
+function spendPassJoker() { const j=getPassJokers(); if(j<=0)return false; setLS(JOKERS_PASS_KEY,j-1); return true; }
+// Compat — getJokers retourne le pool vie (pour les UI legacy)
+function getJokers() { return getLifeJokers(); }
 
 function showJokerToast(msg) {
   const el=document.createElement('div');
@@ -1208,17 +1322,21 @@ function showJokerToast(msg) {
 }
 
 function updateJokerHUD() {
-  const j=getJokers();
-  document.getElementById('jk-num').textContent=j;
-  document.getElementById('jk-label').textContent=j>1?'JOKERS':'JOKER';
+  const life=getLifeJokers(), pass=getPassJokers();
+  const lifeEl=document.getElementById('jk-life-num');
+  const passEl=document.getElementById('jk-pass-num');
+  if(lifeEl) lifeEl.textContent=life;
+  if(passEl) passEl.textContent=pass;
   const btn=document.getElementById('joker-passemur-btn');
-  btn.disabled=(j<=0);
-  btn.style.opacity=j>0?'1':'.35';
-  if(jokerPasseMurActive) btn.classList.add('active');
-  else btn.classList.remove('active');
+  if(btn){
+    btn.disabled=(pass<=0);
+    btn.style.opacity=pass>0?'1':'.35';
+    if(jokerPasseMurActive) btn.classList.add('active');
+    else btn.classList.remove('active');
+  }
 }
 
-/* ─ Skin ─ */
+/* ─ Skin traînées ─ */
 function getSkinId()     { return getLS(SKIN_KEY,'default'); }
 function saveSkin(id)    { setLS(SKIN_KEY,id); currentSkin=id; }
 function getSkinDef(id)  { return SKINS.find(s=>s.id===id)||SKINS[0]; }
@@ -1229,6 +1347,16 @@ function isSkinUnlocked(skin) {
 function getSkinColors() {
   const sk=getSkinDef(currentSkin);
   return sk.colors; // null = use wall color
+}
+
+/* ─ Skin joueur ─ */
+let currentPlayerSkin = 'white';
+function getPlayerSkinId()    { return getLS(PLAYER_SKIN_KEY,'white'); }
+function savePlayerSkin(id)   { setLS(PLAYER_SKIN_KEY,id); currentPlayerSkin=id; }
+function getPlayerSkinDef(id) { return PLAYER_SKINS.find(s=>s.id===id)||PLAYER_SKINS[0]; }
+function isPlayerSkinUnlocked(sk) {
+  if(sk.unlockProgress<0) return true;
+  return getProgress()>=sk.unlockProgress;
 }
 
 /* ── Sauvegarde de partie ── */
@@ -1611,10 +1739,11 @@ function showOverlay({title,sublabel='',sub,btn,btn2=null,btn3=null,color='#fff'
   document.getElementById('quit-btn').classList.remove('show');
   document.getElementById('settings-btn').classList.remove('show');
   document.getElementById('slide-zone').classList.add('hidden');
-  document.getElementById('joker-hud').classList.remove('show');
+  document.getElementById('hud-game').classList.remove('show');
+  document.getElementById('hud-jokers').classList.remove('show');
   document.getElementById('badges-row').style.display='none';
   jokerPasseMurActive=false;
-  hideTabBar();
+  showTabBar(null);
   // main content
   const ids = ['ot','olvl','os','stars-display'];
   ids.forEach(id => { const el=document.getElementById(id); if(el)el.style.display=''; });
@@ -1665,7 +1794,7 @@ function showOverlay({title,sublabel='',sub,btn,btn2=null,btn3=null,color='#fff'
     // Joker vie bonus
     const jlBtn=document.getElementById('joker-life-btn');
     jlBtn.style.display=hasJokerLife?'block':'none';
-    if(hasJokerLife) jlBtn.textContent=`💛 CONTINUER AVEC 1 VIE (${getJokers()} joker${getJokers()>1?'s':''})`;
+    if(hasJokerLife) jlBtn.textContent=`💛 CONTINUER AVEC 1 VIE (${getLifeJokers()} joker${getLifeJokers()>1?'s':''})`;
   }else{
     goSection.classList.remove('show');
     document.getElementById('joker-life-btn').style.display='none';
@@ -1680,13 +1809,17 @@ function showStartOverlay(){
   document.getElementById('settings-section').classList.remove('show');
   document.getElementById('quit-btn').classList.remove('show');
   document.getElementById('slide-zone').classList.add('hidden');
-  document.getElementById('joker-hud').classList.remove('show');
+  document.getElementById('hud-game').classList.remove('show');
+  document.getElementById('hud-jokers').classList.remove('show');
   jokerPasseMurActive=false;
   ['ot','olvl','os'].forEach(id => document.getElementById(id).style.display='');
   document.getElementById('ot').textContent='CHROMATIC MAZE';
   document.getElementById('ot').style.color='#fff';
-  const tot=getTotalStars(), mx=getMaxStars();
-  document.getElementById('olvl').textContent = tot>0 ? `⭐ ${tot} / ${mx}` : '';
+  const tot=getTotalStars(), mx=getMaxStars(), prog=getProgress();
+  const progressLabel = prog>0 ? `NV.${prog+1 <= LEVELS.length ? String(prog+1).padStart(2,'0') : 'P'+(prog-LEVELS.length+1)}` : '';
+  document.getElementById('olvl').textContent = tot>0
+    ? `${progressLabel}  ⭐ ${tot} / ${mx}`
+    : (prog>0 ? progressLabel : '');
   const prestigeUnlocked=getTotalStars()>=PRESTIGE_LEVELS[0].starGate;
   document.getElementById('os').innerHTML=
     (prestigeUnlocked
@@ -1765,8 +1898,8 @@ function showStartOverlay(){
   // ⚙️ Bouton paramètres — visible depuis l'accueil
   document.getElementById('settings-btn').classList.add('show');
 
-  // Tab bar
-  showTabBar(null);
+  // Tab bar avec onglet accueil actif
+  showTabBar('tab-home');
 
   document.getElementById('overlay').classList.add('show');
 }
@@ -1781,6 +1914,8 @@ function showLevelSelect(){
   document.getElementById('scores-section').classList.remove('show');
   document.getElementById('obtn').style.display='none';
   document.getElementById('quit-btn').classList.remove('show');
+  document.getElementById('hud-game').classList.remove('show');
+  document.getElementById('hud-jokers').classList.remove('show');
   ['obtn2','obtn3','daily-btn','score-btn','skin-btn'].forEach(id=>document.getElementById(id).classList.remove('show'));
   // Build grid
   const stars=getStars();
@@ -1851,6 +1986,8 @@ function showScoresOverlay(){
   document.getElementById('level-select-section').classList.remove('show');
   document.getElementById('obtn').style.display='none';
   document.getElementById('quit-btn').classList.remove('show');
+  document.getElementById('hud-game').classList.remove('show');
+  document.getElementById('hud-jokers').classList.remove('show');
   ['obtn2','obtn3','daily-btn','score-btn','skin-btn'].forEach(id=>document.getElementById(id).classList.remove('show'));
 
   const scores=getScores();
@@ -1887,10 +2024,16 @@ function showSkinSelect(){
   document.getElementById('quit-btn').classList.remove('show');
   document.getElementById('badges-row').style.display='none';
   document.getElementById('medals-display').style.display='none';
+  document.getElementById('hud-game').classList.remove('show');
+  document.getElementById('hud-jokers').classList.remove('show');
+  document.getElementById('settings-btn').classList.remove('show');
   ['obtn2','obtn3','daily-btn','score-btn','skin-btn'].forEach(id=>document.getElementById(id).classList.remove('show'));
 
   const activeSkin=getSkinId();
+  const activePlayerSkin=getPlayerSkinId();
   const progress=getProgress();
+
+  // ─ Wall skins ─
   const grid=document.getElementById('skin-grid');
   grid.innerHTML='';
   SKINS.forEach(sk=>{
@@ -1900,7 +2043,8 @@ function showSkinSelect(){
     cell.className='skin-cell'+(selected?' selected':'')+(unlocked?'':' locked');
     const previewColors=sk.colors||[RED,GREEN];
     const dots=previewColors.slice(0,4).map(c=>`<div class="skin-dot" style="background:${c};box-shadow:0 0 4px ${c}"></div>`).join('');
-    cell.innerHTML=`<div class="skin-preview">${dots}</div><div class="skin-name">${sk.emoji} ${sk.name}</div>${!unlocked?`<div class="skin-lock">NV.${LEVELS[sk.unlockProgress]?.label||'??'}</div>`:''}`;
+    const lvlReq = sk.unlockProgress>=0 ? (sk.unlockProgress+1)+'nv' : '';
+    cell.innerHTML=`<div class="skin-preview">${dots}</div><div class="skin-name">${sk.emoji} ${sk.name}</div>${!unlocked?`<div class="skin-lock">${sk.desc}</div>`:''}`;
     if(unlocked){
       cell.addEventListener('click',()=>{
         saveSkin(sk.id);
@@ -1911,6 +2055,27 @@ function showSkinSelect(){
     }
     grid.appendChild(cell);
   });
+
+  // ─ Player skins ─
+  const pgrid=document.getElementById('player-skin-grid');
+  pgrid.innerHTML='';
+  PLAYER_SKINS.forEach(sk=>{
+    const unlocked=isPlayerSkinUnlocked(sk);
+    const selected=sk.id===activePlayerSkin;
+    const cell=document.createElement('div');
+    cell.className='pskin-cell'+(selected?' selected':'')+(unlocked?'':' locked');
+    cell.innerHTML=`<div class="pskin-ball" style="background:${sk.color};box-shadow:0 0 8px ${sk.color}"></div><div class="pskin-name">${sk.emoji} ${sk.name}</div>${!unlocked?`<div class="pskin-lock">${sk.unlockProgress+1}nv requis</div>`:''}`;
+    if(unlocked){
+      cell.addEventListener('click',()=>{
+        savePlayerSkin(sk.id);
+        document.querySelectorAll('.pskin-cell').forEach(c=>c.classList.remove('selected'));
+        cell.classList.add('selected');
+        sfxDoor('green');
+      });
+    }
+    pgrid.appendChild(cell);
+  });
+
   document.getElementById('skin-section').classList.add('show');
   showTabBar('tab-skins');
   document.getElementById('overlay').classList.add('show');
@@ -1921,14 +2086,14 @@ document.getElementById('skin-back-icon').addEventListener('click',()=>{
   showStartOverlay();
 });
 
-/* ══════ TAB BAR ══════ */
+/* ══════ GLOBAL TAB BAR ══════ */
 function setActiveTab(id) {
-  document.querySelectorAll('.tab-item').forEach(t=>t.classList.remove('active'));
-  if(id) document.getElementById(id).classList.add('active');
+  document.querySelectorAll('#global-tab-bar .tab-item').forEach(t=>t.classList.remove('active'));
+  if(id) { const el=document.getElementById(id); if(el) el.classList.add('active'); }
 }
 function showTabBar(activeId) {
-  document.getElementById('tab-bar').classList.add('show');
-  document.getElementById('overlay').classList.add('with-tabbar');
+  const bar = document.getElementById('global-tab-bar');
+  bar.classList.add('show');
   setActiveTab(activeId);
   // Défi du jour : marquer si déjà fait
   const dailyTab=document.getElementById('tab-daily');
@@ -1936,24 +2101,29 @@ function showTabBar(activeId) {
   else dailyTab.classList.remove('daily-done');
 }
 function hideTabBar() {
-  document.getElementById('tab-bar').classList.remove('show');
-  document.getElementById('overlay').classList.remove('with-tabbar');
+  document.getElementById('global-tab-bar').classList.remove('show');
 }
 
 document.getElementById('tab-daily').addEventListener('click',()=>{
   if(isDailyDone()){
     showJokerToast('📅 DÉFI DU JOUR DÉJÀ TERMINÉ ✓'); return;
   }
+  document.getElementById('overlay').classList.add('show');
   startDailyChallenge();
 });
 document.getElementById('tab-levels').addEventListener('click',()=>{
   document.getElementById('overlay').classList.add('show');
   showLevelSelect();
 });
+document.getElementById('tab-home').addEventListener('click',()=>{
+  showStartOverlay();
+});
 document.getElementById('tab-scores').addEventListener('click',()=>{
+  document.getElementById('overlay').classList.add('show');
   showScoresOverlay();
 });
 document.getElementById('tab-skins').addEventListener('click',()=>{
+  document.getElementById('overlay').classList.add('show');
   showSkinSelect();
 });
 
@@ -1970,6 +2140,8 @@ function showSettingsOverlay(){
   document.getElementById('badges-row').style.display='none';
   document.getElementById('medals-display').style.display='none';
   document.getElementById('settings-btn').classList.remove('show');
+  document.getElementById('hud-game').classList.remove('show');
+  document.getElementById('hud-jokers').classList.remove('show');
   ['obtn2','obtn3','daily-btn','score-btn','skin-btn'].forEach(id=>document.getElementById(id).classList.remove('show'));
   // Sync toggle state
   const currentTheme = getLS(THEME_KEY, 'dark');
@@ -2019,10 +2191,15 @@ function beginPlay(){
   jokerPasseMurActive=false;
   livesAtLevelStart=lives;
   currentSkin=getSkinId();
+  currentPlayerSkin=getPlayerSkinId();
   document.getElementById('combo-txt').classList.remove('show');
   document.getElementById('quit-btn').classList.add('show');
   document.getElementById('slide-zone').classList.remove('hidden');
-  document.getElementById('joker-hud').classList.add('show');
+  // Afficher les HUD de jeu
+  document.getElementById('hud-game').classList.add('show');
+  document.getElementById('hud-jokers').classList.add('show');
+  // Masquer la tab bar globale pendant le jeu
+  hideTabBar();
   updateJokerHUD();
   writeSave();
   hideOverlay();updateHUD();startTimer();drawScene();
@@ -2116,8 +2293,9 @@ function handleExit(){
     if(!lvl.isPrestige && !lvl.isInfinite && infiniteIdx===0){
       const lvlNum = levelIdx+1; // 1-based
       if(lvlNum % 3 === 0) {
-        addJoker();
-        setTimeout(()=>showJokerToast(`💛 +1 JOKER ! (${getJokers()} en stock)`), 800);
+        addLifeJoker();
+        addPassJoker();
+        setTimeout(()=>showJokerToast(`💛🛡️ +1 JOKER VIE + PASSE-MUR !`), 800);
       }
     }
   }
@@ -2250,7 +2428,7 @@ function tryMove(dr,dc){
     if(jokerPasseMurActive){
       // Joker passe-mur : ignorer la règle de couleur pour ce coup
       jokerPasseMurActive=false;
-      spendJoker();
+      spendPassJoker();
       updateJokerHUD();
       showJokerToast('🛡️ PASSE-MUR UTILISÉ !');
       // Le mouvement continue (pas de return)
@@ -2262,7 +2440,7 @@ function tryMove(dr,dc){
       if(lives<=0){
         stopTimer();gameState='gameover';sfxGameOver();clearSave();
         setTimeout(()=>{
-          const hasJoker=getJokers()>0;
+          const hasJoker=getLifeJokers()>0;
           showOverlay({
             title:'GAME OVER',sublabel:'',
             sub:`Score : <span style="color:#ffcc44;font-size:15px;font-weight:700">${score}</span><br>Niveau atteint : ${getLvl().label}`,
@@ -2332,14 +2510,14 @@ document.getElementById('quit-btn').addEventListener('click',()=>{
 
 /* ══════ JOKER LISTENERS ══════ */
 document.getElementById('joker-passemur-btn').addEventListener('click',()=>{
-  if(getJokers()<=0 || gameState!=='playing') return;
+  if(getPassJokers()<=0 || gameState!=='playing') return;
   jokerPasseMurActive=!jokerPasseMurActive;
   updateJokerHUD();
   if(jokerPasseMurActive){ sfxDoor('blue'); vib([20,10,20]); }
 });
 
 document.getElementById('joker-life-btn').addEventListener('click',()=>{
-  if(!spendJoker()) return;
+  if(!spendLifeJoker()) return;
   document.getElementById('joker-life-btn').style.display='none';
   lives=1; gameState='playing';
   jokerPasseMurActive=false;
@@ -2354,23 +2532,23 @@ document.getElementById('buy-joker-btn').addEventListener('click',()=>{
     msg.textContent='PAS ASSEZ DE POINTS ✕'; msg.style.color='#ff5555'; msg.style.display='block';
     setTimeout(()=>msg.style.display='none',2200); return;
   }
-  if(getJokers()>=9){
+  if(getLifeJokers()>=9 && getPassJokers()>=9){
     msg.textContent='MAXIMUM ATTEINT (9) ✕'; msg.style.color='#ff5555'; msg.style.display='block';
     setTimeout(()=>msg.style.display='none',2200); return;
   }
-  score-=cost; addJoker();
+  score-=cost; addLifeJoker(); addPassJoker();
   document.getElementById('sc').textContent=score;
   updateBuyJokerInfo();
-  msg.textContent=`💛 JOKER ACHETÉ ! (${getJokers()} en stock)`; msg.style.color='#ffcc44'; msg.style.display='block';
+  msg.textContent=`💛🛡️ JOKERS ACHETÉS ! (💛${getLifeJokers()} 🛡️${getPassJokers()})`; msg.style.color='#ffcc44'; msg.style.display='block';
   sfxWin(); vib([30,15,30]);
   setTimeout(()=>msg.style.display='none',2800);
 });
 
 function updateBuyJokerInfo(){
   const el=document.getElementById('buy-joker-info');
-  if(el) el.textContent=`Score : ${score} pts  ·  ${getJokers()} joker${getJokers()!==1?'s':''} en stock`;
+  if(el) el.textContent=`Score : ${score} pts  ·  💛${getLifeJokers()} 🛡️${getPassJokers()} en stock`;
   const btn=document.getElementById('buy-joker-btn');
-  if(btn) btn.disabled=(score<500||getJokers()>=9);
+  if(btn) btn.disabled=(score<500||(getLifeJokers()>=9&&getPassJokers()>=9));
 }
 
 /* ══════ SLIDE ZONE ══════ */
@@ -2407,8 +2585,10 @@ window.addEventListener('mouseup',e=>{
 if('serviceWorker'in navigator)navigator.serviceWorker.register('sw.js').catch(()=>{});
 
 /* ══════ INIT ══════ */
+_migrateJokers(); // migration pool unique → deux pools
 levelIdx=0;infiniteIdx=0;
 currentSkin=getSkinId();
+currentPlayerSkin=getPlayerSkinId();
 // Appliquer le thème sauvegardé
 applyTheme(getLS(THEME_KEY,'dark'));
 document.getElementById('dpad').classList.add('hidden');
