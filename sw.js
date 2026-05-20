@@ -1,4 +1,4 @@
-const CACHE = 'chromatic-maze-v11';
+const CACHE = 'chromatic-maze-v12';
 const ASSETS = [
   './index.html',
   './manifest.json',

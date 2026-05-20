@@ -1649,31 +1649,41 @@ function buildMaze(){
   minMoves=computeMinMoves();
 }
 
-/* ══════ RIVAL BFS ══════ */
+/* ══════ RIVAL BFS (mêmes règles que le joueur : couleur alternée) ══════ */
 function computeRivalPath(){
   const{cols,rows,entry,exit}=getLvl();
   const[sr,sc]=cellFromEdge(entry.edge,entry.pos,cols,rows);
   const[er,ec]=cellFromEdge(exit.edge,exit.pos,cols,rows);
-  const N=rows*cols;
-  const visited=new Uint8Array(N);
-  const parent=new Int16Array(N).fill(-1);
+  const ST=3; // états: 0=aucune,1=rouge,2=vert
+  const N=rows*cols*ST;
+  const dist=new Int32Array(N).fill(-1);
+  const parent=new Int32Array(N).fill(-1);
+  const enc=(r,c,lci)=>(r*cols+c)*ST+lci;
   const D=[[-1,0],[1,0],[0,-1],[0,1]];
-  const q=[sr*cols+sc]; visited[sr*cols+sc]=1;
+  const start=enc(sr,sc,0);
+  dist[start]=0;
+  const q=[start];
   while(q.length){
     const sid=q.shift();
-    const r=Math.floor(sid/cols),c=sid%cols;
+    const lci=sid%ST,pos=Math.floor(sid/ST),r=Math.floor(pos/cols),c=pos%cols;
     if(r===er&&c===ec){
       const path=[];let cur=sid;
-      while(cur!==-1){path.unshift({r:Math.floor(cur/cols),c:cur%cols});cur=parent[cur];}
+      while(cur!==-1){
+        const p=Math.floor(cur/ST);
+        path.unshift({r:Math.floor(p/cols),c:p%cols});
+        cur=parent[cur];
+      }
       return path;
     }
     for(const[dr,dc]of D){
       const nr=r+dr,nc=c+dc;
       if(nr<0||nr>=rows||nc<0||nc>=cols)continue;
-      if(!getWall(r,c,nr,nc))continue;
-      const nid=nr*cols+nc;
-      if(visited[nid])continue;
-      visited[nid]=1;parent[nid]=sid;q.push(nid);
+      const wall=getWall(r,c,nr,nc);if(!wall)continue;
+      const wci=wall==='red'?1:2;
+      if(lci!==0&&wci===lci)continue; // même couleur que la dernière = bloqué
+      const nid=enc(nr,nc,wci);
+      if(dist[nid]!==-1)continue;
+      dist[nid]=dist[sid]+1;parent[nid]=sid;q.push(nid);
     }
   }
   return null;
