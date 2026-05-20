@@ -161,25 +161,26 @@
     #global-tab-bar.show { display: flex; }
     .tab-item {
       flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center;
-      background: transparent; border: none; cursor: pointer; gap: 3px;
-      font-family: 'Orbitron', monospace; font-size: 6px; font-weight: 700;
+      background: transparent; border: none; cursor: pointer; gap: 4px;
+      font-family: 'Orbitron', monospace; font-size: 6.5px; font-weight: 700;
       letter-spacing: 1.5px; color: var(--overlay-sub2);
-      padding: 6px 2px 10px; transition: color .2s, background .2s;
+      padding: 10px 2px max(16px, calc(10px + env(safe-area-inset-bottom)));
+      transition: color .2s, background .2s;
       -webkit-tap-highlight-color: transparent; position: relative;
     }
-    .tab-item:active { background: rgba(0,255,153,.04); }
+    .tab-item:active { background: rgba(0,255,153,.05); }
     .tab-item.active { color: #00ff99; }
     [data-theme="light"] .tab-item.active { color: #009955; }
     .tab-item.active::after {
-      content: ''; position: absolute; top: 0; left: 20%; right: 20%;
-      height: 2px; border-radius: 0 0 2px 2px;
+      content: ''; position: absolute; top: 0; left: 15%; right: 15%;
+      height: 2.5px; border-radius: 0 0 3px 3px;
       background: #00ff99;
     }
     [data-theme="light"] .tab-item.active::after { background: #009955; }
-    .tab-icon { font-size: 19px; line-height: 1; }
+    .tab-icon { font-size: 22px; line-height: 1; }
     .tab-item.daily-done { opacity: .45; }
     /* Home tab — légèrement mis en valeur */
-    #tab-home .tab-icon { font-size: 21px; }
+    #tab-home .tab-icon { font-size: 24px; }
     #tab-home { opacity: .9; }
 
     /* ── HUD GAME (au-dessus du canvas, visible pendant le jeu) ── */
@@ -433,15 +434,45 @@
 
     /* ── QUIT BUTTON (HUD) ── */
     #quit-btn {
-      font-family: 'Orbitron', monospace; font-size: 8px; font-weight: 700;
-      letter-spacing: 2px; padding: 5px 10px;
+      font-size: 16px; line-height: 1; padding: 5px 8px;
       border: 1.5px solid #aa2222; color: #cc3333;
-      border-radius: 6px; background: rgba(180,30,30,.10); cursor: pointer;
+      border-radius: 8px; background: rgba(180,30,30,.10); cursor: pointer;
       -webkit-tap-highlight-color: transparent; display: none; transition: all .15s;
       box-shadow: 0 0 8px rgba(200,40,40,.20);
     }
-    #quit-btn.show { display: flex; align-items: center; gap: 4px; }
-    #quit-btn:active { color: #ff5555; border-color: #ff2222; background: rgba(255,53,53,.18); transform: scale(.95); box-shadow: 0 0 14px rgba(255,53,53,.35); }
+    #quit-btn.show { display: flex; align-items: center; justify-content: center; }
+    #quit-btn:active { color: #ff5555; border-color: #ff2222; background: rgba(255,53,53,.18); transform: scale(.95); }
+
+    /* ── RESTART BUTTON (HUD) ── */
+    #restart-btn {
+      font-size: 16px; line-height: 1; padding: 5px 8px;
+      border: 1.5px solid #226644; color: #00cc77;
+      border-radius: 8px; background: rgba(0,180,80,.10); cursor: pointer;
+      -webkit-tap-highlight-color: transparent; display: none; transition: all .15s;
+      box-shadow: 0 0 8px rgba(0,200,100,.15);
+    }
+    #restart-btn.show { display: flex; align-items: center; justify-content: center; }
+    #restart-btn:active { color: #00ff99; border-color: #00ff99; background: rgba(0,255,153,.15); transform: scale(.95) rotate(-30deg); }
+
+    /* ── SCORE EN HAUT (accueil) ── */
+    #hud-score-top {
+      font-family: 'Share Tech Mono', monospace; font-size: 10px;
+      color: #ffcc44; letter-spacing: 1px; display: none; align-items: center; gap: 4px;
+    }
+    #hud-score-top.show { display: flex; }
+
+    /* ── RIVAL BADGE ── */
+    #rival-badge {
+      font-family: 'Share Tech Mono', monospace; font-size: 9px;
+      color: #ff6633; letter-spacing: 1px; display: none; align-items: center; gap: 3px;
+      border: 1px solid #662200; border-radius: 6px; padding: 2px 6px;
+      background: rgba(255,80,0,.10);
+    }
+    #rival-badge.show { display: flex; }
+    @keyframes rivalPulse {
+      0%,100% { opacity:1; } 50% { opacity:.4; }
+    }
+    #rival-badge.warning { animation: rivalPulse .7s ease-in-out infinite; color:#ff3300; border-color:#ff3300; }
 
     /* ── STAR ANIMATION ── */
     @keyframes starPop {
@@ -604,7 +635,7 @@
     #slide-zone {
       position: relative; z-index: 1;
       width: calc(100% - 28px); max-width: 412px;
-      height: 170px;
+      height: 210px;
       display: flex; align-items: center; justify-content: center;
       border-radius: 14px;
       margin: 4px 0 max(10px, env(safe-area-inset-bottom));
@@ -741,6 +772,65 @@
     .pskin-cell.selected .pskin-name { color:#00ff99; }
     .pskin-lock { font-size:7px; color:var(--btn-sec-color); letter-spacing:.5px; margin-top:2px; }
 
+    /* ── DAILY CALENDAR ── */
+    #daily-section { display:none; flex-direction:column; align-items:center; width:100%; padding:0 10px; }
+    #daily-section.show { display:flex; }
+    #daily-cal-title { font-family:'Share Tech Mono',monospace; font-size:8px; color:var(--overlay-sub2); letter-spacing:3px; margin-bottom:4px; text-align:center; }
+    #daily-month-nav { display:flex; align-items:center; gap:10px; margin-bottom:8px; }
+    #daily-month-lbl { font-family:'Orbitron',monospace; font-size:9px; font-weight:700; color:var(--lb-name); letter-spacing:2px; min-width:120px; text-align:center; }
+    .daily-nav-btn {
+      font-family:'Orbitron',monospace; font-size:10px; font-weight:700;
+      background:transparent; border:1px solid var(--cell-border); color:var(--overlay-sub2);
+      border-radius:6px; padding:3px 8px; cursor:pointer; transition:all .15s;
+      -webkit-tap-highlight-color:transparent;
+    }
+    .daily-nav-btn:active { color:var(--txt-hud); border-color:var(--txt-hud); }
+    #daily-weekdays {
+      display:grid; grid-template-columns:repeat(7,1fr); gap:3px;
+      width:100%; max-width:300px; margin-bottom:3px;
+    }
+    .daily-wd {
+      font-family:'Share Tech Mono',monospace; font-size:7px; color:var(--overlay-sub2);
+      text-align:center; padding:2px 0; letter-spacing:.5px;
+    }
+    #daily-grid {
+      display:grid; grid-template-columns:repeat(7,1fr); gap:4px;
+      width:100%; max-width:300px;
+    }
+    .dc-cell {
+      aspect-ratio:1; display:flex; flex-direction:column; align-items:center; justify-content:center;
+      border-radius:8px; border:1px solid transparent; font-family:'Share Tech Mono',monospace;
+      font-size:10px; font-weight:700; position:relative; transition:all .15s;
+    }
+    .dc-cell.dc-empty { border:none; pointer-events:none; }
+    .dc-cell.dc-future { border-color:var(--cell-border); background:var(--cell-bg); color:var(--overlay-sub2); opacity:.35; pointer-events:none; }
+    .dc-cell.dc-missed { border-color:#3a1010; background:rgba(100,20,20,.25); color:#663333; }
+    .dc-cell.dc-done   { border-color:#1a4422; background:rgba(0,100,50,.25); color:#00cc77; }
+    .dc-cell.dc-today-pending {
+      border-color:#ffcc44; background:rgba(255,204,68,.12); color:#ffcc44;
+      box-shadow:0 0 10px rgba(255,204,68,.25); animation:todayPulse 1.8s ease-in-out infinite alternate; cursor:pointer;
+    }
+    .dc-cell.dc-today-done { border-color:#00ff99; background:rgba(0,255,153,.12); color:#00ff99; box-shadow:0 0 10px rgba(0,255,153,.2); }
+    @keyframes todayPulse {
+      from { box-shadow:0 0 6px rgba(255,204,68,.2); }
+      to   { box-shadow:0 0 18px rgba(255,204,68,.5); }
+    }
+    .dc-check { font-size:8px; position:absolute; bottom:1px; line-height:1; }
+    #daily-streak { font-family:'Share Tech Mono',monospace; font-size:9px; color:var(--overlay-sub2); letter-spacing:1px; margin-top:8px; text-align:center; }
+    #daily-play-btn {
+      font-family:'Orbitron',monospace; font-size:11px; font-weight:700; letter-spacing:2px;
+      padding:10px 28px; margin-top:10px;
+      border:2px solid #ffcc44; color:#ffcc44;
+      box-shadow:0 0 14px rgba(255,204,68,.3); border-radius:8px; background:transparent; cursor:pointer;
+      -webkit-tap-highlight-color:transparent; transition:all .2s; display:none;
+    }
+    #daily-play-btn.show { display:block; }
+    #daily-play-btn:active { background:rgba(255,204,68,.12); transform:scale(.97); }
+    #daily-back { font-family:'Orbitron',monospace; font-size:9px; font-weight:700; letter-spacing:2px;
+      padding:7px 20px; border:1px solid var(--btn-sec-border); color:var(--btn-sec-color); border-radius:8px;
+      background:transparent; cursor:pointer; margin-top:8px; transition:all .2s; -webkit-tap-highlight-color:transparent; }
+    #daily-back:active { color:var(--txt-hud); border-color:var(--txt-hud); }
+
     /* ── BUY JOKER OPTIONS ── */
     .buy-joker-row {
       display:flex; align-items:center; justify-content:space-between;
@@ -768,7 +858,10 @@
     </div>
     <div id="timer-wrap">⏱ <span id="timer">00:00</span></div>
     <div id="lvl-badge">LEVEL 01</div>
-    <button id="quit-btn"><span>✕</span><span>QUITTER</span></button>
+    <div id="hud-score-top">💰 <span id="sc-top">0</span></div>
+    <div id="rival-badge">👾 <span id="rival-lbl">RIVAL</span></div>
+    <button id="restart-btn" title="Recommencer le niveau">↺</button>
+    <button id="quit-btn" title="Quitter">✕</button>
   </div>
 
   <!-- HUD JEU : PORTE / MOVES / SCORE — visible pendant le jeu -->
@@ -843,6 +936,26 @@
         <div id="ls-grid"></div>
         <button id="ls-back">← RETOUR</button>
       </div>
+      <!-- Daily calendar -->
+      <div id="daily-section">
+        <div id="daily-cal-title">📅 DÉFI DU JOUR</div>
+        <div id="daily-month-nav">
+          <button class="daily-nav-btn" id="daily-prev">◀</button>
+          <div id="daily-month-lbl"></div>
+          <button class="daily-nav-btn" id="daily-next">▶</button>
+        </div>
+        <div id="daily-weekdays">
+          <div class="daily-wd">LUN</div><div class="daily-wd">MAR</div>
+          <div class="daily-wd">MER</div><div class="daily-wd">JEU</div>
+          <div class="daily-wd">VEN</div><div class="daily-wd">SAM</div>
+          <div class="daily-wd">DIM</div>
+        </div>
+        <div id="daily-grid"></div>
+        <div id="daily-streak"></div>
+        <button id="daily-play-btn">▶ JOUER LE DÉFI</button>
+        <button id="daily-back">← RETOUR</button>
+      </div>
+
       <!-- Game over -->
       <div id="go-section">
         <button id="joker-life-btn">💛 CONTINUER AVEC 1 VIE</button>
@@ -1042,28 +1155,28 @@ const LEVELS = [
     hint:'Le défi ultime — 9×9, 76% rouge.<br>Seuls les maîtres voient la sortie.' },
 ];
 
-/* ══════ 5 NIVEAUX PRESTIGE (3 couleurs) ══════ */
+/* ══════ 5 NIVEAUX PRESTIGE ══════ */
 const PRESTIGE_LEVELS = [
   { cols:7, rows:7, label:'P1', name:'CHROMATIQUE', diff:'★★★★',
     entry:{edge:'bottom',pos:0}, exit:{edge:'top',pos:6},
-    redBias:0.40, blueBias:0.30, pathBias:0.20, starGate:10, isPrestige:true,
-    hint:'3 couleurs — rouge, vert, bleu.<br>Jamais 2 fois la même couleur d\'affilée.' },
+    redBias:0.50, pathBias:0.20, starGate:10, isPrestige:true,
+    hint:'Labyrinthe prestige 7×7.<br>Jamais 2 fois la même couleur d\'affilée.' },
   { cols:8, rows:7, label:'P2', name:'PRISME', diff:'★★★★',
     entry:{edge:'left',pos:6}, exit:{edge:'right',pos:0},
-    redBias:0.38, blueBias:0.32, pathBias:0.18, starGate:18, isPrestige:true,
-    hint:'Le bleu envahit la droite.<br>Anticipe la couleur qui vient.' },
+    redBias:0.52, pathBias:0.18, starGate:18, isPrestige:true,
+    hint:'Le rouge domine la droite.<br>Anticipe la couleur qui vient.' },
   { cols:8, rows:8, label:'P3', name:'KALÉIDOSCOPE', diff:'★★★★',
     entry:{edge:'bottom',pos:0}, exit:{edge:'bottom',pos:7},
-    redBias:0.36, blueBias:0.34, pathBias:0.15, starGate:27, isPrestige:true,
-    hint:'Entrée et sortie en bas — arène 8×8.<br>3 couleurs, 1 seule sortie.' },
+    redBias:0.52, pathBias:0.15, starGate:27, isPrestige:true,
+    hint:'Entrée et sortie en bas — arène 8×8.<br>1 seule sortie, garde la tête froide.' },
   { cols:9, rows:8, label:'P4', name:'SPECTRE', diff:'★★★★',
     entry:{edge:'top',pos:0}, exit:{edge:'top',pos:8},
-    redBias:0.34, blueBias:0.34, pathBias:0.12, starGate:36, isPrestige:true,
-    hint:'Équilibre parfait rouge-vert-bleu.<br>Seuls les maîtres voient le chemin.' },
+    redBias:0.52, pathBias:0.12, starGate:36, isPrestige:true,
+    hint:'Rouge vs vert — équilibre parfait.<br>Seuls les maîtres voient le chemin.' },
   { cols:9, rows:9, label:'P5', name:'ABSOLU', diff:'★★★★',
     entry:{edge:'bottom',pos:4}, exit:{edge:'top',pos:4},
-    redBias:0.33, blueBias:0.33, pathBias:0.10, starGate:45, isPrestige:true,
-    hint:'9×9 · 3 couleurs · équilibré.<br>Le défi ultime de Chromatic Maze.' },
+    redBias:0.50, pathBias:0.10, starGate:45, isPrestige:true,
+    hint:'9×9 · 2 couleurs · défi ultime.<br>Le sommet de Chromatic Maze.' },
 ];
 
 /* ══════ SKINS TRAÎNÉES ══════ */
@@ -1071,13 +1184,13 @@ const SKINS = [
   { id:'default',  name:'DÉFAUT',   emoji:'⚪', unlockProgress:-1,
     colors:null, desc:'Toujours disponible' },
   { id:'fire',     name:'FEU',      emoji:'🔥', unlockProgress:9,
-    colors:['#ff6600','#ff3300','#ffaa00'], desc:'10 niveaux requis' },
+    colors:['#ff6600','#ff3300'], desc:'10 niveaux requis' },
   { id:'electric', name:'FOUDRE',   emoji:'⚡', unlockProgress:14,
-    colors:['#00ccff','#ffffff','#88ddff'], desc:'15 niveaux requis' },
+    colors:['#00ccff','#ffffff'], desc:'15 niveaux requis' },
   { id:'neon',     name:'NÉON',     emoji:'🌈', unlockProgress:19,
-    colors:['#ff00ff','#00ffff','#ff88ff'], desc:'20 niveaux requis' },
+    colors:['#ff00ff','#00ffff'], desc:'20 niveaux requis' },
   { id:'rainbow',  name:'PRISME',   emoji:'✨', unlockProgress:24,
-    colors:['#ff3535','#00ff99','#4466ff','#ffcc44'], desc:'25 niv. / prestige' },
+    colors:['#ff3535','#00ff99'], desc:'25 niv. / prestige' },
 ];
 
 /* ══════ SKINS JOUEUR (couleur de la balle) ══════ */
@@ -1140,6 +1253,13 @@ let livesAtLevelStart = 3; // pour la médaille "sans faute"
 let currentSkin = 'default';
 let jokerPasseMurActive = false;
 
+/* ══════ RIVAL STATE ══════ */
+let rivalPath = [];
+let rivalStep = 0;
+let rivalInterval = null;
+let rivalTimeout = null;
+let rivalVisible = false;
+
 /* ══════ PARTICLES (drawn on game canvas) ══════ */
 let particles = [];
 let pAnimId = null;
@@ -1200,7 +1320,7 @@ function trailParticle() {
   if (skinColors) {
     col = skinColors[Math.floor(Math.random()*skinColors.length)];
   } else {
-    col = lastDoor === 'red' ? RED : lastDoor === 'green' ? GREEN : lastDoor === 'blue' ? BLUE : '#ffffff';
+    col = lastDoor === 'red' ? RED : lastDoor === 'green' ? GREEN : '#ffffff';
   }
   spawnParticles(px, py, col, 3);
 }
@@ -1218,7 +1338,7 @@ function beep(freq,dur,type,vol){
 }
 function sfxDoor(c){
   if(c==='green'){beep(440,.08,'square',.12);setTimeout(()=>beep(660,.1,'sine',.1),60);}
-  else if(c==='blue'){beep(550,.08,'triangle',.12);setTimeout(()=>beep(770,.1,'sine',.1),60);}
+  else if(c==='joker'){beep(600,.07,'sine',.12);setTimeout(()=>beep(900,.09,'sine',.09),50);setTimeout(()=>beep(1200,.1,'sine',.07),110);}
   else{beep(330,.08,'square',.12);setTimeout(()=>beep(220,.1,'sine',.1),60);}
 }
 function sfxFail(){beep(180,.07,'sawtooth',.2);setTimeout(()=>beep(130,.15,'sawtooth',.15),90);}
@@ -1230,7 +1350,8 @@ function sfxCombo(m){const f=[440,550,660,770,880][Math.min(m-2,4)];beep(f,.05,'
 const JOKERS_KEY      = 'cmaze_jokers'; // ancien (migration)
 const JOKERS_LIFE_KEY = 'cmaze_jokers_life';
 const JOKERS_PASS_KEY = 'cmaze_jokers_pass';
-const SCORE_KEY     = 'chromatic_maze_scores';
+const SCORE_KEY       = 'chromatic_maze_scores';
+const DAILY_HIST_KEY  = 'cmaze_daily_history';
 const STARS_KEY     = 'cmaze_stars';
 const REC_KEY       = 'cmaze_records';
 const PROG_KEY      = 'cmaze_progress';
@@ -1469,7 +1590,7 @@ function computeMinMoves(){
   const{cols,rows,entry,exit,isPrestige=false}=getLvl();
   const[sr,sc]=cellFromEdge(entry.edge,entry.pos,cols,rows);
   const[er,ec]=cellFromEdge(exit.edge, exit.pos, cols,rows);
-  const ST=isPrestige?4:3; // states per cell: 0=none,1=red,2=green,3=blue
+  const ST=3; // states per cell: 0=none,1=red,2=green
   const N=rows*cols*ST;
   const dist=new Int32Array(N).fill(-1);
   const enc=(r,c,lci)=>(r*cols+c)*ST+lci;
@@ -1501,35 +1622,147 @@ function setWallColor(fr,fc,tr,tc,col){
   else if(tc===fc&&tr===fr-1)walls[tr][tc].bottom=col;
 }
 
-function randomWallColor(redBias, blueBias=0) {
-  const r = Math.random();
-  if (r < redBias) return 'red';
-  if (r < redBias + blueBias) return 'blue';
-  return 'green';
+function randomWallColor(redBias) {
+  return Math.random() < redBias ? 'red' : 'green';
 }
 
 function buildMaze(){
-  const{cols,rows,redBias,entry,exit,pathBias,blueBias=0,isPrestige=false}=getLvl();
+  const{cols,rows,redBias,entry,exit,pathBias}=getLvl();
   walls=[];
   for(let r=0;r<rows;r++){walls[r]=[];for(let c=0;c<cols;c++){
     walls[r][c]={
-      right: c<cols-1?randomWallColor(redBias,blueBias):null,
-      bottom:r<rows-1?randomWallColor(redBias,blueBias):null,
+      right: c<cols-1?randomWallColor(redBias):null,
+      bottom:r<rows-1?randomWallColor(redBias):null,
     };
   }}
   const[sr,sc]=cellFromEdge(entry.edge,entry.pos,cols,rows);
   const[er,ec]=cellFromEdge(exit.edge, exit.pos, cols,rows);
   const path=windingPath(sr,sc,er,ec,cols,rows,pathBias);
   if(path&&path.length>=2){
-    const colors = isPrestige ? ['red','green','blue'] : ['red','green'];
-    let col = colors[Math.floor(Math.random()*colors.length)];
+    const colors=['red','green'];
+    let col=colors[Math.floor(Math.random()*2)];
     for(let i=0;i<path.length-1;i++){
       setWallColor(path[i][0],path[i][1],path[i+1][0],path[i+1][1],col);
-      const others = colors.filter(x=>x!==col);
-      col = others[Math.floor(Math.random()*others.length)];
+      col=col==='red'?'green':'red';
     }
   }
   minMoves=computeMinMoves();
+}
+
+/* ══════ RIVAL BFS ══════ */
+function computeRivalPath(){
+  const{cols,rows,entry,exit}=getLvl();
+  const[sr,sc]=cellFromEdge(entry.edge,entry.pos,cols,rows);
+  const[er,ec]=cellFromEdge(exit.edge,exit.pos,cols,rows);
+  const N=rows*cols;
+  const visited=new Uint8Array(N);
+  const parent=new Int16Array(N).fill(-1);
+  const D=[[-1,0],[1,0],[0,-1],[0,1]];
+  const q=[sr*cols+sc]; visited[sr*cols+sc]=1;
+  while(q.length){
+    const sid=q.shift();
+    const r=Math.floor(sid/cols),c=sid%cols;
+    if(r===er&&c===ec){
+      const path=[];let cur=sid;
+      while(cur!==-1){path.unshift({r:Math.floor(cur/cols),c:cur%cols});cur=parent[cur];}
+      return path;
+    }
+    for(const[dr,dc]of D){
+      const nr=r+dr,nc=c+dc;
+      if(nr<0||nr>=rows||nc<0||nc>=cols)continue;
+      if(!getWall(r,c,nr,nc))continue;
+      const nid=nr*cols+nc;
+      if(visited[nid])continue;
+      visited[nid]=1;parent[nid]=sid;q.push(nid);
+    }
+  }
+  return null;
+}
+
+function getRivalDelay(){
+  const lvl=getLvl();
+  if(lvl.isInfinite) return Math.max(180,600-infiniteIdx*18);
+  if(lvl.isPrestige) return 200;
+  if(levelIdx<4) return 0;
+  if(levelIdx<10) return 700;
+  if(levelIdx<15) return 500;
+  if(levelIdx<25) return 350;
+  return 200;
+}
+
+function sfxRivalWin(){
+  beep(330,.1,'sawtooth',.2);
+  setTimeout(()=>beep(270,.12,'sawtooth',.18),110);
+  setTimeout(()=>beep(200,.25,'sawtooth',.15),240);
+}
+
+function rivalWins(){
+  stopRival();
+  stopTimer();
+  gameState='gameover';
+  sfxRivalWin();
+  vib([80,30,80,30,150]);
+  const hasJoker=getLifeJokers()>0;
+  setTimeout(()=>{
+    showOverlay({
+      title:'LE RIVAL T\'A EU !',
+      sub:`Il est sorti en ${rivalPath.length} coups 😤<br>Score : <span style="color:#ffcc44;font-size:15px;font-weight:700">${score}</span>`,
+      btn:'↩ RECOMMENCER',color:'#ff6633',btnClass:'red',
+      gameOver:true,hasJokerLife:hasJoker,
+      cb:()=>{ stopRival(); replayLevel(); }
+    });
+  },400);
+}
+
+function updateRivalBadge(){
+  const badge=document.getElementById('rival-badge');
+  const lbl=document.getElementById('rival-lbl');
+  if(!badge)return;
+  if(!rivalVisible&&rivalTimeout){
+    badge.classList.add('show');badge.classList.remove('warning');
+    lbl.textContent='RIVAL…';return;
+  }
+  if(rivalVisible&&rivalPath.length>0){
+    badge.classList.add('show');
+    const pct=rivalStep/rivalPath.length;
+    if(pct>0.75){badge.classList.add('warning');lbl.textContent='RIVAL !!!';}
+    else if(pct>0.5){badge.classList.remove('warning');lbl.textContent='RIVAL !!';}
+    else{badge.classList.remove('warning');lbl.textContent='RIVAL';}
+    return;
+  }
+  badge.classList.remove('show','warning');
+}
+
+function startRival(){
+  stopRival();
+  const delay=getRivalDelay();
+  if(delay===0){
+    document.getElementById('rival-badge')?.classList.remove('show','warning');
+    return;
+  }
+  rivalPath=computeRivalPath()||[];
+  rivalStep=0; rivalVisible=false;
+  updateRivalBadge();
+  rivalTimeout=setTimeout(()=>{
+    if(gameState!=='playing')return;
+    rivalVisible=true;
+    updateRivalBadge();
+    drawScene();
+    rivalInterval=setInterval(()=>{
+      if(gameState!=='playing'){stopRival();return;}
+      rivalStep++;
+      updateRivalBadge();
+      if(rivalStep>=rivalPath.length){rivalWins();return;}
+      drawScene();
+    },delay);
+  },3000);
+}
+
+function stopRival(){
+  clearTimeout(rivalTimeout);
+  clearInterval(rivalInterval);
+  rivalInterval=null; rivalTimeout=null; rivalVisible=false;
+  document.getElementById('rival-badge')?.classList.remove('show','warning');
 }
 
 function getWall(fr,fc,tr,tc){
@@ -1634,6 +1867,15 @@ function drawScene(){
   highlightCell(xC.c,xC.r,xCol);
   drawIndicator(lvl.entry,eCol,true);
   drawIndicator(lvl.exit, xCol, false);
+  if(rivalVisible&&rivalPath.length>0&&rivalStep<rivalPath.length){
+    const rp=rivalPath[rivalStep];
+    const rx=cx(rp.c)+CELL/2,ry=cy(rp.r)+CELL/2;
+    const rr=Math.floor(CELL*.22);
+    ctx.save();ctx.shadowColor='rgba(255,90,0,.9)';ctx.shadowBlur=16;ctx.fillStyle='#ff6633';ctx.beginPath();ctx.arc(rx,ry,rr,0,Math.PI*2);ctx.fill();ctx.restore();
+    ctx.save();ctx.strokeStyle='#cc3300';ctx.lineWidth=1.5;ctx.beginPath();ctx.arc(rx,ry,rr+2,0,Math.PI*2);ctx.stroke();ctx.restore();
+    ctx.save();ctx.fillStyle='#ff3300';ctx.font=`bold ${Math.max(7,Math.floor(CELL*.22))}px Orbitron,monospace`;
+    ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText('👾',rx,ry);ctx.restore();
+  }
   if(gameState==='playing'){
     const px=cx(playerX)+CELL/2,py=cy(playerY)+CELL/2;
     const r1=Math.floor(CELL*.26),r2=Math.floor(CELL*.15),r3=Math.floor(CELL*.22);
@@ -1675,8 +1917,9 @@ function updateHUD(){
   for(let i=1;i<=3;i++)document.getElementById('l'+i).classList.toggle('lost',i>lives);
   const el=document.getElementById('ldtxt');
   el.textContent=lastDoor?lastDoor.toUpperCase():'—';
-  el.style.color=lastDoor==='red'?RED:lastDoor==='green'?GREEN:lastDoor==='blue'?BLUE:'#555';
+  el.style.color=lastDoor==='red'?RED:lastDoor==='green'?GREEN:'#555';
   document.getElementById('sc').textContent=score;
+  const scTop=document.getElementById('sc-top'); if(scTop) scTop.textContent=score;
   const lvl=getLvl();
   const recs=getRecords();
   const myRec=recs[lvl.label];
@@ -1741,6 +1984,9 @@ function showOverlay({title,sublabel='',sub,btn,btn2=null,btn3=null,color='#fff'
   document.getElementById('slide-zone').classList.add('hidden');
   document.getElementById('hud-game').classList.remove('show');
   document.getElementById('hud-jokers').classList.remove('show');
+  document.getElementById('quit-btn').classList.remove('show');
+  document.getElementById('restart-btn').classList.remove('show');
+  document.getElementById('hud-score-top').classList.add('show');
   document.getElementById('badges-row').style.display='none';
   jokerPasseMurActive=false;
   showTabBar(null);
@@ -1807,10 +2053,13 @@ function showStartOverlay(){
   document.getElementById('scores-section').classList.remove('show');
   document.getElementById('skin-section').classList.remove('show');
   document.getElementById('settings-section').classList.remove('show');
+  document.getElementById('daily-section').classList.remove('show');
   document.getElementById('quit-btn').classList.remove('show');
+  document.getElementById('restart-btn').classList.remove('show');
   document.getElementById('slide-zone').classList.add('hidden');
   document.getElementById('hud-game').classList.remove('show');
   document.getElementById('hud-jokers').classList.remove('show');
+  document.getElementById('hud-score-top').classList.add('show');
   jokerPasseMurActive=false;
   ['ot','olvl','os'].forEach(id => document.getElementById(id).style.display='');
   document.getElementById('ot').textContent='CHROMATIC MAZE';
@@ -1850,8 +2099,12 @@ function showStartOverlay(){
     const lvlLabel = save.infiniteIdx > 0
       ? `∞${save.infiniteIdx}`
       : (LEVELS[save.levelIdx] ? LEVELS[save.levelIdx].label : save.levelIdx+1);
-    obtn.textContent = `↩ CONTINUER  NV.${lvlLabel}  ${save.score}pts`;
+    obtn.textContent = `↩ CONTINUER · NV.${lvlLabel}`;
     obtn.className = 'continue';
+    // Afficher le score en haut
+    const scTop=document.getElementById('sc-top');
+    if(scTop){ scTop.textContent=save.score||0; }
+    document.getElementById('hud-score-top').classList.add('show');
     obtn.onclick = continueGame;
     secBtnSetup('obtn2', '↺ NOUVELLE PARTIE', ()=>startGame());
     document.getElementById('obtn2').classList.add('menu-link');
@@ -1914,8 +2167,10 @@ function showLevelSelect(){
   document.getElementById('scores-section').classList.remove('show');
   document.getElementById('obtn').style.display='none';
   document.getElementById('quit-btn').classList.remove('show');
+  document.getElementById('restart-btn').classList.remove('show');
   document.getElementById('hud-game').classList.remove('show');
   document.getElementById('hud-jokers').classList.remove('show');
+  document.getElementById('hud-score-top').classList.add('show');
   ['obtn2','obtn3','daily-btn','score-btn','skin-btn'].forEach(id=>document.getElementById(id).classList.remove('show'));
   // Build grid
   const stars=getStars();
@@ -2105,11 +2360,9 @@ function hideTabBar() {
 }
 
 document.getElementById('tab-daily').addEventListener('click',()=>{
-  if(isDailyDone()){
-    showJokerToast('📅 DÉFI DU JOUR DÉJÀ TERMINÉ ✓'); return;
-  }
   document.getElementById('overlay').classList.add('show');
-  startDailyChallenge();
+  calViewYear = new Date().getFullYear(); calViewMonth = new Date().getMonth();
+  showDailyCalendar();
 });
 document.getElementById('tab-levels').addEventListener('click',()=>{
   document.getElementById('overlay').classList.add('show');
@@ -2162,6 +2415,13 @@ document.getElementById('theme-toggle').addEventListener('change', function(){
 });
 
 /* ══════ DAILY CHALLENGE ══════ */
+function getDailyHistory() { return getLS(DAILY_HIST_KEY, {}); }
+function saveDailyResult(dateKey, completed, sc) {
+  const h = getDailyHistory();
+  h[dateKey] = { completed, score: sc };
+  setLS(DAILY_HIST_KEY, h);
+}
+
 function startDailyChallenge(){
   const d=new Date();
   const dayOfYear=Math.floor((d-new Date(d.getFullYear(),0,0))/86400000);
@@ -2171,6 +2431,135 @@ function startDailyChallenge(){
   hideOverlay();
   setupCanvas();buildMaze();updateHUD();beginPlay();
 }
+
+// ─ Calendrier des défis ─
+let calViewYear, calViewMonth;
+
+function showDailyCalendar() {
+  const now = new Date();
+  if (calViewYear === undefined) { calViewYear = now.getFullYear(); calViewMonth = now.getMonth(); }
+
+  // Hide other sections
+  ['ot','olvl','os','stars-display'].forEach(id=>{ const el=document.getElementById(id); if(el)el.style.display='none'; });
+  document.getElementById('bias-bar-wrap').classList.remove('show');
+  document.getElementById('go-section').classList.remove('show');
+  document.getElementById('scores-section').classList.remove('show');
+  document.getElementById('level-select-section').classList.remove('show');
+  document.getElementById('skin-section').classList.remove('show');
+  document.getElementById('obtn').style.display='none';
+  document.getElementById('quit-btn').classList.remove('show');
+  document.getElementById('restart-btn').classList.remove('show');
+  document.getElementById('hud-game').classList.remove('show');
+  document.getElementById('hud-jokers').classList.remove('show');
+  document.getElementById('hud-score-top').classList.add('show');
+  document.getElementById('badges-row').style.display='none';
+  document.getElementById('medals-display').style.display='none';
+  document.getElementById('settings-btn').classList.remove('show');
+  ['obtn2','obtn3','daily-btn','score-btn','skin-btn'].forEach(id=>document.getElementById(id).classList.remove('show'));
+
+  renderDailyCalendar();
+  document.getElementById('daily-section').classList.add('show');
+  showTabBar('tab-daily');
+  document.getElementById('overlay').classList.add('show');
+}
+
+function renderDailyCalendar() {
+  const now = new Date();
+  const todayKey = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-${String(now.getDate()).padStart(2,'0')}`;
+  const history = getDailyHistory();
+
+  // Month label
+  const monthNames = ['JANVIER','FÉVRIER','MARS','AVRIL','MAI','JUIN','JUILLET','AOÛT','SEPTEMBRE','OCTOBRE','NOVEMBRE','DÉCEMBRE'];
+  document.getElementById('daily-month-lbl').textContent = `${monthNames[calViewMonth]} ${calViewYear}`;
+
+  // Next button disabled if viewing current or future month
+  const isCurrentOrFuture = (calViewYear > now.getFullYear()) || (calViewYear === now.getFullYear() && calViewMonth >= now.getMonth());
+  document.getElementById('daily-next').style.opacity = isCurrentOrFuture ? '.3' : '1';
+  document.getElementById('daily-next').disabled = isCurrentOrFuture;
+
+  // Build calendar
+  const grid = document.getElementById('daily-grid');
+  grid.innerHTML = '';
+
+  const firstDay = new Date(calViewYear, calViewMonth, 1);
+  // Monday=0 offset (JS: Sunday=0, so shift)
+  let startDow = firstDay.getDay(); // 0=Sun,1=Mon,...
+  startDow = (startDow === 0) ? 6 : startDow - 1; // Mon-based
+
+  const daysInMonth = new Date(calViewYear, calViewMonth + 1, 0).getDate();
+
+  // Empty cells before first day
+  for (let i = 0; i < startDow; i++) {
+    const empty = document.createElement('div');
+    empty.className = 'dc-cell dc-empty';
+    grid.appendChild(empty);
+  }
+
+  for (let d = 1; d <= daysInMonth; d++) {
+    const dateKey = `${calViewYear}-${String(calViewMonth+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+    const cell = document.createElement('div');
+    cell.className = 'dc-cell';
+
+    const cellDate = new Date(calViewYear, calViewMonth, d);
+    const isToday = dateKey === todayKey;
+    const isPast = cellDate < new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    const isFuture = cellDate > new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    const histEntry = history[dateKey];
+    const isLegacy = !histEntry && getLS(DAILY_KEY, null)?.date === dateKey && getLS(DAILY_KEY, null)?.completed;
+
+    if (isFuture) {
+      cell.classList.add('dc-future');
+    } else if (isToday) {
+      const done = (histEntry?.completed) || isLegacy || isDailyDone();
+      cell.classList.add(done ? 'dc-today-done' : 'dc-today-pending');
+      if (!done) { cell.title = 'Jouer le défi du jour'; }
+    } else if (isPast) {
+      const done = (histEntry?.completed) || isLegacy;
+      cell.classList.add(done ? 'dc-done' : 'dc-missed');
+      if (done) { const check=document.createElement('span'); check.className='dc-check'; check.textContent='✓'; cell.appendChild(check); }
+    }
+
+    cell.innerHTML = `<span>${d}</span>` + cell.innerHTML;
+    grid.appendChild(cell);
+  }
+
+  // Streak calculation
+  let streak = 0;
+  const check = new Date(now);
+  while (true) {
+    const dk = `${check.getFullYear()}-${String(check.getMonth()+1).padStart(2,'0')}-${String(check.getDate()).padStart(2,'0')}`;
+    const done = history[dk]?.completed || (getLS(DAILY_KEY, null)?.date === dk && getLS(DAILY_KEY, null)?.completed);
+    if (done) { streak++; check.setDate(check.getDate()-1); }
+    else break;
+  }
+  const streakEl = document.getElementById('daily-streak');
+  if (streak > 0) { streakEl.textContent = `🔥 SÉRIE EN COURS : ${streak} JOUR${streak>1?'S':''}`; streakEl.style.color='#ff8844'; }
+  else { streakEl.textContent = 'Joue chaque jour pour construire une série !'; streakEl.style.color=''; }
+
+  // Play button
+  const playBtn = document.getElementById('daily-play-btn');
+  if (isDailyDone()) { playBtn.textContent='✓ DÉFI DU JOUR COMPLÉTÉ'; playBtn.disabled=true; playBtn.style.opacity='.5'; playBtn.classList.remove('show'); }
+  else { playBtn.textContent='▶ JOUER LE DÉFI DU JOUR'; playBtn.disabled=false; playBtn.style.opacity='1'; playBtn.classList.add('show'); }
+}
+
+document.getElementById('daily-prev').addEventListener('click',()=>{
+  calViewMonth--; if(calViewMonth<0){calViewMonth=11;calViewYear--;}
+  renderDailyCalendar();
+});
+document.getElementById('daily-next').addEventListener('click',()=>{
+  const now=new Date();
+  if(calViewYear===now.getFullYear()&&calViewMonth>=now.getMonth()) return;
+  calViewMonth++; if(calViewMonth>11){calViewMonth=0;calViewYear++;}
+  renderDailyCalendar();
+});
+document.getElementById('daily-play-btn').addEventListener('click',()=>{
+  document.getElementById('daily-section').classList.remove('show');
+  startDailyChallenge();
+});
+document.getElementById('daily-back').addEventListener('click',()=>{
+  document.getElementById('daily-section').classList.remove('show');
+  showStartOverlay();
+});
 
 /* ══════ GAME LOGIC ══════ */
 document.getElementById('save-score-btn').addEventListener('click',()=>{
@@ -2194,6 +2583,8 @@ function beginPlay(){
   currentPlayerSkin=getPlayerSkinId();
   document.getElementById('combo-txt').classList.remove('show');
   document.getElementById('quit-btn').classList.add('show');
+  document.getElementById('restart-btn').classList.add('show');
+  document.getElementById('hud-score-top').classList.remove('show');
   document.getElementById('slide-zone').classList.remove('hidden');
   // Afficher les HUD de jeu
   document.getElementById('hud-game').classList.add('show');
@@ -2203,6 +2594,7 @@ function beginPlay(){
   updateJokerHUD();
   writeSave();
   hideOverlay();updateHUD();startTimer();drawScene();
+  startRival();
 }
 
 function replayLevel(){
@@ -2253,7 +2645,7 @@ function nextLevel(){
 }
 
 function handleExit(){
-  stopTimer();
+  stopTimer();stopRival();
   moveCount++;
 
   // Particles + haptics
@@ -2288,6 +2680,7 @@ function handleExit(){
     newBadgesList=checkAndAwardBadges(lvl.label, lvl.isPrestige);
     if(isDailyChallenge){
       setLS(DAILY_KEY,{date:todayKey(),completed:true,score});
+      saveDailyResult(todayKey(), true, score);
     }
     // Joker toutes les 3 niveaux normaux
     if(!lvl.isPrestige && !lvl.isInfinite && infiniteIdx===0){
@@ -2438,7 +2831,7 @@ function tryMove(dr,dc){
       updateCombo(false);
       sfxFail();flashPlayer(isLight()?RED_L:'#ff3535');updateHUD();
       if(lives<=0){
-        stopTimer();gameState='gameover';sfxGameOver();clearSave();
+        stopTimer();stopRival();gameState='gameover';sfxGameOver();clearSave();
         setTimeout(()=>{
           const hasJoker=getLifeJokers()>0;
           showOverlay({
@@ -2497,15 +2890,23 @@ window.addEventListener('resize',()=>{if(gameState==='playing'){setupCanvas();dr
 
 // Title tap → go back to menu
 document.getElementById('title-txt').addEventListener('click',()=>{
-  if(gameState==='playing'){stopTimer();gameState='paused';writeSave();}
+  if(gameState==='playing'){stopTimer();stopRival();gameState='paused';writeSave();}
   showStartOverlay();
 });
 
 // Quit button
 document.getElementById('quit-btn').addEventListener('click',()=>{
-  if(gameState==='playing'){stopTimer();gameState='paused';writeSave();}
+  if(gameState==='playing'){stopTimer();stopRival();gameState='paused';writeSave();}
   document.getElementById('quit-btn').classList.remove('show');
+  document.getElementById('restart-btn').classList.remove('show');
   showStartOverlay();
+});
+
+// Restart button — recommencer le niveau en cours
+document.getElementById('restart-btn').addEventListener('click',()=>{
+  if(gameState!=='playing'&&gameState!=='paused') return;
+  vib([20,10,20]);
+  setupCanvas();buildMaze();updateHUD();beginPlay();
 });
 
 /* ══════ JOKER LISTENERS ══════ */
@@ -2513,7 +2914,7 @@ document.getElementById('joker-passemur-btn').addEventListener('click',()=>{
   if(getPassJokers()<=0 || gameState!=='playing') return;
   jokerPasseMurActive=!jokerPasseMurActive;
   updateJokerHUD();
-  if(jokerPasseMurActive){ sfxDoor('blue'); vib([20,10,20]); }
+  if(jokerPasseMurActive){ sfxDoor('joker'); vib([20,10,20]); }
 });
 
 document.getElementById('joker-life-btn').addEventListener('click',()=>{
